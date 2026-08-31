@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OpsLogic — Homepage Mockup v3 (Brand Colors)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black:#0B0C10;
+    --ink-2:#14161C;
+    --gray:#7C8591;
+    --gray-lt:#C9CED6;
+    --white:#F6F8FB;
+    --blue:#1CA7E0;
+    --blue-2:#0E7FB0;
+    --orange:#FF8A1E;
+    --border:3px solid var(--black);
+    --shadow:6px 6px 0 var(--black);
+    --shadow-sm:4px 4px 0 var(--black);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--white);
+    font-family:'Inter',sans-serif;
+    color:var(--black);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  a{ text-decoration:none; color:inherit; }
+  ul{ list-style:none; }
+  button{ font:inherit; cursor:pointer; }
+
+  .font-display{ font-family:'Space Grotesk',sans-serif; }
+  .font-mono{ font-family:'IBM Plex Mono',monospace; }
+
+  .container{ max-width:1280px; margin:0 auto; padding:0 24px; position:relative; }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase;
+    letter-spacing:0.12em; color:var(--gray);
+  }
+
+  /* ---------- cursor glow ---------- */
+  #cursor-glow{
+    position:fixed; top:0; left:0; width:520px; height:520px; border-radius:50%; pointer-events:none; z-index:1;
+    background:radial-gradient(circle, rgba(28,167,224,0.16) 0%, rgba(255,138,30,0.08) 45%, transparent 70%);
+    transform:translate(-50%,-50%); transition:opacity .3s ease; opacity:0;
+  }
+
+  /* ---------- reveal ---------- */
+  .reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- gradient text ---------- */
+  .grad-text{
+    background:linear-gradient(90deg,var(--blue),var(--orange),var(--blue));
+    background-size:200% auto;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:gradmove 4s linear infinite;
+  }
+  @keyframes gradmove{ to{ background-position:200% center; } }
+
+  /* ---------- sticker / spinning badge ---------- */
+  .sticker{
+    display:inline-flex; align-items:center; gap:6px; background:var(--orange); border:var(--border);
+    border-radius:999px; padding:6px 16px 8px; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.06em; box-shadow:var(--shadow-sm); transform:rotate(-4deg); color:var(--black);
+  }
+
+  .spin-badge{
+    position:absolute; width:120px; height:120px; z-index:3;
+  }
+  .spin-badge svg{ animation:spin 14s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .spin-badge .center-dot{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:22px;
+  }
+
+  /* ---------- blobs ---------- */
+  .blob{ position:absolute; border-radius:50%; filter:blur(4px); z-index:0; opacity:0.5; animation:float 9s ease-in-out infinite, morph 10s ease-in-out infinite; }
+  @keyframes float{ 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-24px) rotate(10deg); } }
+  @keyframes morph{
+    0%,100%{ border-radius:50%; }
+    33%{ border-radius:42% 58% 60% 40% / 45% 40% 60% 55%; }
+    66%{ border-radius:60% 40% 45% 55% / 55% 60% 40% 45%; }
+  }
+
+  /* ---------- NAV ---------- */
+  .nav{ position:sticky; top:0; z-index:100; padding:18px 0; }
+  .nav-inner{
+    background:var(--black); border:var(--border); border-radius:999px; box-shadow:var(--shadow);
+    height:70px; display:flex; align-items:center; justify-content:space-between; padding:0 12px 0 20px;
+  }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:38px; height:38px; border-radius:10px; background:var(--white); display:flex; align-items:center; justify-content:center;
+    transform:rotate(-6deg); border:2px solid var(--black); transition:transform .3s ease;
+  }
+  .nav-inner:hover .logo-mark{ transform:rotate(6deg) scale(1.08); }
+  .logo-mark span{ color:var(--blue); font-weight:800; font-size:14px; }
+  .logo-text{ font-weight:700; font-size:19px; letter-spacing:-0.02em; color:var(--white); }
+
+  .nav-links{ display:flex; gap:28px; font-family:'IBM Plex Mono',monospace; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray-lt); }
+  .nav-links a{ position:relative; padding:4px 0; transition:color .2s ease; }
+  .nav-links a::after{ content:""; position:absolute; left:0; bottom:0; width:0; height:2px; background:var(--orange); transition:width .25s ease; }
+  .nav-links a:hover{ color:#fff; }
+  .nav-links a:hover::after{ width:100%; }
+  .nav-links a.tpl-link{ color:var(--orange); }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; border-radius:999px; padding:12px 22px; font-weight:700; font-size:14px;
+    border:var(--border); box-shadow:var(--shadow-sm); transition:transform .18s ease, box-shadow .18s ease, background .2s ease;
+    background:var(--black); color:#fff; position:relative;
+  }
+  .btn:hover{ transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--black); }
+  .btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--black); }
+  .btn-orange{ background:var(--orange); color:var(--black); }
+  .btn-blue{ background:var(--blue); color:#fff; }
+  .btn-white{ background:#fff; color:var(--black); }
+  .btn-lg{ padding:16px 30px; font-size:16px; }
+  .btn-outline{ background:transparent; color:var(--black); border-color:var(--black); }
+
+  @media (max-width:900px){ .nav-links{ display:none; } }
+  @media (max-width:600px){ .nav-cta{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{ position:relative; padding:74px 0 90px; overflow:visible; background:
+    radial-gradient(circle at 15% 20%, rgba(28,167,224,0.08), transparent 40%),
+    radial-gradient(circle at 85% 60%, rgba(255,138,30,0.08), transparent 40%); }
+
+  .hero-grid{ display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px; align-items:center; position:relative; z-index:2; }
+  @media (max-width:960px){ .hero-grid{ grid-template-columns:1fr; } }
+
+  .hero h1{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:40px; line-height:1.05; letter-spacing:-0.01em; margin-top:22px; }
+  @media (min-width:640px){ .hero h1{ font-size:54px; } }
+  @media (min-width:1024px){ .hero h1{ font-size:62px; } }
+
+  .scribble{ position:relative; display:inline-block; }
+  .scribble svg{ position:absolute; bottom:-6px; left:0; width:100%; z-index:-1; }
+
+  .hero p.sub{ margin-top:22px; font-size:18px; color:var(--gray); max-width:540px; }
+  .hero-actions{ margin-top:32px; display:flex; flex-wrap:wrap; gap:16px; }
+  .hero-meta{ margin-top:36px; display:flex; align-items:center; gap:16px; font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray); }
+  .meta-dot{ width:4px; height:4px; border-radius:999px; background:var(--gray); }
+
+  /* magnetic wrapper handled by JS */
+  .magnetic{ display:inline-block; }
+
+  /* rotating gradient border wrapper */
+  .glow-frame{
+    position:relative; padding:6px; border-radius:32px;
+    background:conic-gradient(from var(--angle,0deg), var(--blue), var(--orange), var(--blue));
+    animation:rotate-border 6s linear infinite;
+  }
+  @keyframes rotate-border{ to{ --angle:360deg; } }
+  @property --angle{ syntax:'<angle>'; inherits:false; initial-value:0deg; }
+
+  .card-stack{ position:relative; width:100%; max-width:420px; margin:0 auto; aspect-ratio:1/1; }
+  .stack-card{
+    position:absolute; inset:0; border:var(--border); border-radius:28px; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px;
+    transition:transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .stack-card .big{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:46px; line-height:1; }
+  .stack-card .lbl{ font-family:'IBM Plex Mono',monospace; text-transform:uppercase; font-size:12px; letter-spacing:0.08em; margin-top:10px; }
+  .stack-card:nth-child(1){ background:var(--blue); color:#fff; transform:rotate(-6deg) translate(-8px,4px); z-index:3; }
+  .stack-card:nth-child(2){ background:var(--orange); color:var(--black); transform:rotate(4deg) translate(10px,10px); z-index:2; }
+  .stack-card:nth-child(3){ background:var(--black); color:#fff; transform:rotate(-2deg) translate(0,20px); z-index:1; }
+  .card-stack:hover .stack-card:nth-child(1){ transform:rotate(-10deg) translate(-30px,-14px); }
+  .card-stack:hover .stack-card:nth-child(2){ transform:rotate(8deg) translate(26px,4px); }
+  .card-stack:hover .stack-card:nth-child(3){ transform:rotate(0deg) translate(0,34px); }
+
+  .floating-tag{
+    position:absolute; background:#fff; border:var(--border); border-radius:14px; box-shadow:var(--shadow-sm);
+    padding:8px 14px; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; text-transform:uppercase;
+    animation:float 7s ease-in-out infinite; z-index:4;
+  }
+
+  /* marquee */
+  .marquee{
+    border-top:var(--border); border-bottom:var(--border); background:var(--black);
+    padding:16px 0; overflow:hidden; transform:rotate(-1.2deg); margin:56px 0 -12px;
+  }
+  .marquee-track{
+    display:flex; width:max-content; align-items:center; gap:40px; animation:scroll 24s linear infinite;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:20px; text-transform:uppercase; color:#fff;
+  }
+  .marquee-track span{ display:flex; align-items:center; gap:40px; }
+  .marquee-track .star{ color:var(--orange); display:inline-block; animation:spin 3s linear infinite; }
+  @keyframes scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  /* ---------- BUILD YOUR STACK ---------- */
+  .stack-builder{ padding:110px 0 90px; }
+  .builder-head{ text-align:center; max-width:640px; margin:0 auto 48px; }
+  .builder-head h2{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:32px; margin-top:12px; }
+  @media (min-width:640px){ .builder-head h2{ font-size:40px; } }
+  .builder-head p{ margin-top:14px; color:var(--gray); }
+
+  .builder-box{
+    background:#fff; border:var(--border); border-radius:28px; box-shadow:var(--shadow);
+    padding:32px; display:grid; grid-template-columns:1.3fr 1fr; gap:32px;
+  }
+  @media (max-width:800px){ .builder-box{ grid-template-columns:1fr; } }
+
+  .pick-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:480px){ .pick-grid{ grid-template-columns:1fr; } }
+
+  .pick-chip{
+    border:2.5px solid var(--gray-lt); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:10px;
+    font-weight:600; font-size:14px; background:var(--white); box-shadow:3px 3px 0 rgba(11,12,16,0.08);
+    transition:transform .15s ease, box-shadow .15s ease, background .2s ease, border-color .2s ease; user-select:none;
+  }
+  .pick-chip:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(11,12,16,0.15); border-color:var(--blue); }
+  .pick-chip input{ display:none; }
+  .pick-chip .box{
+    width:20px; height:20px; border:2.5px solid var(--black); border-radius:6px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; background:#fff; transition:background .2s ease;
+  }
+  .pick-chip .box svg{ opacity:0; transition:opacity .15s ease; width:13px; height:13px; }
+  .pick-chip input:checked ~ .box{ background:var(--orange); }
+  .pick-chip input:checked ~ .box svg{ opacity:1; }
+  .pick-chip.active{ background:rgba(28,167,224,0.08); border-color:var(--blue); box-shadow:3px 3px 0 var(--blue); }
+
+  .summary-panel{ background:var(--black); border-radius:20px; padding:26px; color:#fff; display:flex; flex-direction:column; justify-content:space-between; }
+  .summary-panel .eyebrow{ color:var(--gray-lt); }
+  .summary-list{ margin-top:14px; min-height:110px; display:flex; flex-direction:column; gap:8px; }
+  .summary-list .empty{ font-size:14px; color:var(--gray); font-style:italic; }
+  .summary-item{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; background:rgba(255,255,255,0.08);
+    border-radius:10px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center;
+    animation:pop .25s ease; border-left:3px solid var(--orange);
+  }
+  @keyframes pop{ from{ transform:scale(0.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .summary-panel .btn{ margin-top:18px; width:100%; justify-content:center; }
+
+  /* ---------- ABOUT ---------- */
+  .about{ padding:70px 0 90px; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+  @media (max-width:900px){ .about{ grid-template-columns:1fr; } }
+  .about-visual{ position:relative; }
+  .about-card{
+    aspect-ratio:4/3; border-radius:28px; border:var(--border); box-shadow:var(--shadow); overflow:hidden;
+    background:linear-gradient(135deg,var(--blue),var(--orange)); display:flex; align-items:center; justify-content:center;
+    padding:40px; transform:rotate(-2deg); transition:transform .4s ease;
+  }
+  .about-visual:hover .about-card{ transform:rotate(0deg) scale(1.02); }
+  .about-card p{ font-family:'Space Grotesk',sans-serif; color:#fff; font-size:22px; font-weight:600; line-height:1.4; }
+  .stat-chip{
+    position:absolute; bottom:-22px; right:-18px; background:var(--orange); border:var(--border); border-radius:16px;
+    box-shadow:var(--shadow-sm); padding:16px 22px; transform:rotate(5deg); animation:float 6s ease-in-out infinite;
+  }
+  .stat-chip .num{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:30px; color:var(--black); }
+  .stat-chip .label{ font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; }
+
+  .about-text h2{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:32px; margin:12px 0 18px; letter-spacing:-0.01em; }
+  .about-text p{ color:var(--gray); line-height:1.7; margin-bottom:14px; }
+  .link-arrow{ margin-top:20px; display:inline-flex; align-items:center; gap:8px; font-weight:700; color:var(--blue); }
+  .link-arrow svg{ transition:transform .25s ease; }
+  .link-arrow:hover svg{ transform:translateX(6px); }
+
+  /* ---------- SERVICES (flip) ---------- */
+  .services{ background:var(--black); padding:90px 0; position:relative; overflow:hidden; }
+  .services-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:48px; }
+  .services-head .eyebrow{ color:var(--gray-lt); }
+  .services-head h2{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:32px; color:#fff; margin-top:10px; max-width:480px; }
+  .services-head .desc{ color:var(--gray); max-width:300px; font-size:14px; }
+
+  .services-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width:900px){ .services-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:600px){ .services-grid{ grid-template-columns:1fr; } }
+
+  .flip-card{ perspective:1200px; height:210px; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .55s cubic-bezier(.2,.8,.2,1); transform-style:preserve-3d; }
+  .flip-card:hover .flip-inner{ transform:rotateY(180deg); }
+  .flip-front, .flip-back{ position:absolute; inset:0; backface-visibility:hidden; border-radius:22px; border:2.5px solid var(--black); padding:24px; display:flex; flex-direction:column; }
+  .flip-front{ background:#fff; justify-content:space-between; border-color:rgba(255,255,255,0.15); }
+  .flip-back{ transform:rotateY(180deg); display:flex; align-items:flex-start; justify-content:center; flex-direction:column; border-color:rgba(0,0,0,0.2); }
+  .flip-front .num{ font-family:'IBM Plex Mono',monospace; font-size:12px; opacity:0.4; }
+  .flip-front h3{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:19px; }
+  .flip-front .hint{ font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; opacity:0.4; }
+  .flip-back p{ color:#fff; font-size:14px; line-height:1.55; margin-bottom:14px; }
+  .flip-back a{ font-weight:700; font-size:14px; color:var(--black); background:#fff; padding:8px 14px; border-radius:999px; }
+
+  /* ---------- STATS ---------- */
+  .stats{ padding:80px 0; }
+  .stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; text-align:center; }
+  @media (max-width:800px){ .stats-grid{ grid-template-columns:1fr 1fr; } }
+  .stat-box{ border:2.5px solid var(--black); border-radius:20px; padding:26px 12px; box-shadow:var(--shadow-sm); transition:transform .2s ease, box-shadow .2s ease; }
+  .stat-box:hover{ transform:translateY(-4px); box-shadow:6px 8px 0 var(--blue); }
+  .stat-box .count{ font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:38px; }
+  .stat-box .lbl{ font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gray); margin-top:6px; }
+
+  /* ---------- WHY US ---------- */
+  .why{ padding:70px 0 100px; }
+  .why h2{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:32px; margin:12px 0 40px; max-width:480px; }
+  .accordion-item{ border:2.5px solid var(--black); border-radius:18px; margin-bottom:14px; overflow:hidden; background:#fff; transition:border-color .2s ease; }
+  .accordion-item.open{ border-color:var(--blue); }
+  .accordion-btn{ width:100%; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:20px 22px; background:transparent; border:none; text-align:left; }
+  .accordion-btn h3{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; }
+  .accordion-plus{
+    width:30px; height:30px; border-radius:50%; border:2.5px solid var(--black); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; position:relative; transition:transform .3s ease, background .3s ease, border-color .3s ease;
+  }
+  .accordion-plus::before, .accordion-plus::after{ content:""; position:absolute; background:var(--black); }
+  .accordion-plus::before{ width:12px; height:2.5px; }
+  .accordion-plus::after{ width:2.5px; height:12px; transition:transform .3s ease; }
+  .accordion-item.open .accordion-plus{ background:var(--orange); border-color:var(--orange); transform:rotate(180deg); }
+  .accordion-item.open .accordion-plus::after{ transform:scaleY(0); }
+  .accordion-panel{ max-height:0; overflow:hidden; transition:max-height .4s ease; }
+  .accordion-panel-inner{ padding:0 22px 22px; color:var(--gray); font-size:14px; line-height:1.65; max-width:600px; }
+
+  /* ---------- CTA ---------- */
+  .cta-section{ padding:0 0 100px; }
+  .cta-box{
+    border-radius:32px; border:var(--border); box-shadow:var(--shadow); padding:70px 28px; text-align:center;
+    position:relative; overflow:hidden; background:linear-gradient(120deg,var(--blue),var(--orange));
+  }
+  .cta-box h2{ font-family:'Space Grotesk',sans-serif; font-weight:800; color:#fff; font-size:30px; max-width:620px; margin:0 auto; }
+  @media (min-width:640px){ .cta-box h2{ font-size:44px; } }
+  .cta-box p{ color:rgba(255,255,255,0.92); margin-top:18px; max-width:460px; margin-left:auto; margin-right:auto; }
+  .cta-box .btn{ margin-top:32px; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ border-top:var(--border); background:var(--black); color:#fff; }
+  .footer-grid{ padding:52px 0; display:grid; grid-template-columns:repeat(4,1fr); gap:36px; }
+  @media (max-width:900px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:500px){ .footer-grid{ grid-template-columns:1fr; } }
+  .footer-brand{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .footer-desc{ font-size:14px; color:var(--gray-lt); line-height:1.6; }
+  .footer-heading{ font-family:'IBM Plex Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray); margin-bottom:14px; }
+  .footer-list li{ font-size:14px; color:var(--gray-lt); margin-bottom:9px; }
+  .footer-bottom{ border-top:2px solid rgba(255,255,255,0.15); padding:20px 0; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--gray); }
+
+  .float-cta{ position:fixed; bottom:22px; right:22px; z-index:200; box-shadow:var(--shadow); animation:wiggle 4s ease-in-out infinite; }
+  @keyframes wiggle{ 0%,92%,100%{ transform:rotate(0deg); } 94%{ transform:rotate(-4deg); } 96%{ transform:rotate(4deg); } 98%{ transform:rotate(-2deg); } }
+  @media (max-width:640px){ .float-cta{ display:none; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .blob, .marquee-track, .float-cta, .spin-badge svg, .marquee-track .star, .grad-text, .glow-frame{ animation:none !important; }
+    .reveal{ opacity:1; transform:none; transition:none; }
+    #cursor-glow{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor-glow"></div>
+
+<!-- ===================== NAV ===================== -->
+<div class="container">
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="logo">
+        <div class="logo-mark"><span>OL</span></div>
+        <span class="logo-text font-display">OpsLogic</span>
+      </div>
+      <nav class="nav-links font-mono">
+        <a href="#builder">Build Your Stack</a>
+        <a href="#services">Services</a>
+        <a href="#why">Why Us</a>
+        <a href="#contact">Contact</a>
+        <a href="index.html" class="tpl-link">Home Demo</a>
+        <a href="template-2.html" class="tpl-link">Template 2</a>
+      </nav>
+      <a href="#contact" class="btn btn-orange nav-cta magnetic">
+        Book a call
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </header>
+</div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="blob" style="width:260px;height:260px;background:var(--blue);top:-40px;left:-80px;animation-delay:0s;"></div>
+  <div class="blob" style="width:180px;height:180px;background:var(--gray-lt);bottom:20px;left:38%;animation-delay:1.5s;"></div>
+  <div class="blob" style="width:220px;height:220px;background:var(--orange);top:60px;right:-60px;animation-delay:.8s;"></div>
+
+  <div class="container hero-grid">
+    <div class="reveal in">
+      <span class="sticker">✦ Now booking Q3 slots</span>
+      <h1 class="font-display">
+        Run your back office
+        like it's <span class="scribble grad-text">actually fun<svg height="16" viewBox="0 0 300 16" preserveAspectRatio="none"><path d="M2 12 Q 80 -4 150 10 T 298 8" stroke="#FF8A1E" stroke-width="7" fill="none" stroke-linecap="round"/></svg></span>.
+      </h1>
+      <p class="sub">OpsLogic sets up and runs the operations, IT, hiring, payroll and SAP work behind a growing business — so you get your time back for the stuff that actually moves the needle.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-orange btn-lg magnetic">Book a free consult 🚀</a>
+        <a href="#builder" class="btn btn-outline btn-lg magnetic">Build my stack ↓</a>
+      </div>
+      <div class="hero-meta font-mono">
+        <span>Hyderabad · Toronto</span>
+        <span class="meta-dot"></span>
+        <span>6 services, 1 team</span>
+      </div>
+    </div>
+
+    <div style="position:relative;">
+      <div class="glow-frame">
+        <div class="card-stack" style="background:var(--white); border-radius:26px;">
+          <div class="stack-card">
+            <div class="big">01</div>
+            <div class="lbl font-mono">Setup fast</div>
+          </div>
+          <div class="stack-card">
+            <div class="big">02</div>
+            <div class="lbl font-mono">Run smooth</div>
+          </div>
+          <div class="stack-card">
+            <div class="big">03</div>
+            <div class="lbl font-mono">Scale up</div>
+          </div>
+        </div>
+      </div>
+      <div class="floating-tag" style="top:-14px; right:-6px; animation-delay:.3s;">⚡ zero downtime</div>
+      <div class="floating-tag" style="bottom:-10px; left:-16px; animation-delay:1.2s;">🎯 tailor-made</div>
+
+      <div class="spin-badge" style="top:-40px; left:-44px;">
+        <svg viewBox="0 0 100 100" width="100" height="100">
+          <defs><path id="circlePath" d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"/></defs>
+          <text font-family="IBM Plex Mono" font-size="8.2" letter-spacing="2" fill="var(--black)">
+            <textPath href="#circlePath">• OPSLOGIC • BUILT FOR SCALE • OPSLOGIC • BUILT FOR SCALE </textPath>
+          </text>
+        </svg>
+        <div class="center-dot">→</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee">
+    <div class="marquee-track font-display">
+      <span><span class="star">★</span> Trusted by Adani Cement <span class="star">★</span> Ambuja <span class="star">★</span> DFW <span class="star">★</span> OTM Labs <span class="star">★</span> Orbit <span class="star">★</span> Chemtrade <span class="star">★</span> Audience Group</span>
+      <span><span class="star">★</span> Trusted by Adani Cement <span class="star">★</span> Ambuja <span class="star">★</span> DFW <span class="star">★</span> OTM Labs <span class="star">★</span> Orbit <span class="star">★</span> Chemtrade <span class="star">★</span> Audience Group</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BUILD YOUR STACK ===================== -->
+<section id="builder" class="container stack-builder">
+  <div class="builder-head reveal">
+    <span class="eyebrow">Interactive · Takes 10 seconds</span>
+    <h2 class="font-display">Build your ops stack</h2>
+    <p>Tick the functions eating your time — we'll show you exactly what OpsLogic would take off your plate.</p>
+  </div>
+
+  <div class="builder-box reveal">
+    <div class="pick-grid" id="pickGrid">
+      <label class="pick-chip"><input type="checkbox" value="Business Operations"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Business Operations</label>
+      <label class="pick-chip"><input type="checkbox" value="IT Solutions"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>IT Solutions</label>
+      <label class="pick-chip"><input type="checkbox" value="Hiring"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Hiring Services</label>
+      <label class="pick-chip"><input type="checkbox" value="Payroll"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Payroll Services</label>
+      <label class="pick-chip"><input type="checkbox" value="SAP"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>SAP Services</label>
+      <label class="pick-chip"><input type="checkbox" value="Workspace"><span class="box"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#0B0C10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Shared Workspace</label>
+    </div>
+
+    <div class="summary-panel">
+      <div>
+        <span class="eyebrow font-mono">Your stack</span>
+        <div class="summary-list" id="summaryList">
+          <div class="empty">Nothing picked yet — tick a few boxes 👈</div>
+        </div>
+      </div>
+      <a href="#contact" class="btn btn-blue magnetic">Get a quote for this →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section id="about" class="container about">
+  <div class="about-visual reveal">
+    <div class="about-card">
+      <p>"We don't add another vendor. We become the team that keeps everything running."</p>
+    </div>
+    <div class="stat-chip font-mono">
+      <div class="num font-display">9+</div>
+      <div class="label">Enterprise clients</div>
+    </div>
+  </div>
+  <div class="about-text reveal">
+    <span class="eyebrow">About OpsLogic</span>
+    <h2 class="font-display">Structured operations, run by people who've done it before.</h2>
+    <p>Behind every efficient business is a team that knows how operations actually work. OpsLogic builds and manages the systems that drive clarity, consistency and momentum — hiring, IT, payroll, SAP and day-to-day business operations — as one coordinated function instead of six separate vendors.</p>
+    <p>A proven, end-to-end outsourcing model built for companies establishing or scaling in India, with a growing footprint into Canada.</p>
+    <a href="#contact" class="link-arrow">Read our story
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ===================== SERVICES (flip) ===================== -->
+<section id="services" class="services">
+  <div class="container">
+    <div class="services-head reveal">
+      <div>
+        <span class="eyebrow">Core Services · hover to flip</span>
+        <h2 class="font-display">Six functions. One accountable team.</h2>
+      </div>
+      <p class="desc">Every service is tailor-made — pick one function or hand us the whole back office.</p>
+    </div>
+
+    <div class="services-grid">
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">01</div><h3 class="font-display">Business Operations</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--blue);"><p>Business setup, process design and day-to-day execution — you focus on strategy, we handle the moving parts.</p><a href="#">View details</a></div>
+        </div>
+      </div>
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">02</div><h3 class="font-display">IT Solutions</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--orange);"><p style="color:#0B0C10">Infrastructure, helpdesk and cloud support built for scale — secure systems that keep running smoothly.</p><a href="#" style="background:#0B0C10;color:#fff;">View details</a></div>
+        </div>
+      </div>
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">03</div><h3 class="font-display">Hiring Services</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--gray);"><p>High-performing teams aligned to your goals — from strategic hires to full contract staffing.</p><a href="#">View details</a></div>
+        </div>
+      </div>
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">04</div><h3 class="font-display">Payroll Services</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--black); border-color:rgba(255,255,255,0.2);"><p>Accurate salary disbursements, tax deductions and statutory filings — your team paid right, every time.</p><a href="#">View details</a></div>
+        </div>
+      </div>
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">05</div><h3 class="font-display">SAP Services</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--blue-2);"><p>SAP enhancements and post-go-live support, plus flexible staffing when you need experts fast.</p><a href="#">View details</a></div>
+        </div>
+      </div>
+      <div class="flip-card reveal">
+        <div class="flip-inner">
+          <div class="flip-front"><div class="num">06</div><h3 class="font-display">Shared Workspaces</h3><div class="hint">hover →</div></div>
+          <div class="flip-back" style="background:var(--orange);"><p style="color:#0B0C10">Fully equipped, flexible space with high-speed internet and private zones — workspace meets business support.</p><a href="#" style="background:#0B0C10;color:#fff;">View details</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STATS ===================== -->
+<section class="container stats">
+  <div class="stats-grid">
+    <div class="stat-box reveal"><div class="count" data-count="9">0</div><div class="lbl font-mono">Enterprise clients</div></div>
+    <div class="stat-box reveal"><div class="count" data-count="6">0</div><div class="lbl font-mono">Core services</div></div>
+    <div class="stat-box reveal"><div class="count" data-count="2">0</div><div class="lbl font-mono">Countries</div></div>
+    <div class="stat-box reveal"><div class="count" data-count="100" data-suffix="%">0</div><div class="lbl font-mono">Tailor-made</div></div>
+  </div>
+</section>
+
+<!-- ===================== WHY US ===================== -->
+<section id="why" class="container why">
+  <span class="eyebrow reveal">Why OpsLogic</span>
+  <h2 class="font-display reveal">What changes when we're the ones running it.</h2>
+
+  <div class="accordion" id="accordion">
+    <div class="accordion-item reveal open">
+      <button class="accordion-btn">
+        <h3 class="font-display">Results-driven execution</h3>
+        <span class="accordion-plus"></span>
+      </button>
+      <div class="accordion-panel">
+        <div class="accordion-panel-inner">We don't measure success by activity. Every engagement is built to solve a real problem and show up as a measurable outcome.</div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <button class="accordion-btn">
+        <h3 class="font-display">Seamless integration</h3>
+        <span class="accordion-plus"></span>
+      </button>
+      <div class="accordion-panel">
+        <div class="accordion-panel-inner">We act as a true extension of your team, fitting into your existing workflows and pace instead of imposing our own.</div>
+      </div>
+    </div>
+    <div class="accordion-item reveal">
+      <button class="accordion-btn">
+        <h3 class="font-display">Multi-function expertise</h3>
+        <span class="accordion-plus"></span>
+      </button>
+      <div class="accordion-panel">
+        <div class="accordion-panel-inner">Hiring, IT, payroll and SAP under one roof — one aligned team instead of five separate vendors to manage.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section id="contact" class="container cta-section">
+  <div class="cta-box reveal">
+    <h2 class="font-display">Ready to hand off the back office?</h2>
+    <p>Book a free consultation — no obligations, just a conversation about what's slowing you down.</p>
+    <a href="#" class="btn btn-white btn-lg magnetic">Book your free consultation</a>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-brand">
+        <div class="logo-mark"><span>OL</span></div>
+        <span class="logo-text font-display">OpsLogic</span>
+      </div>
+      <p class="footer-desc">Your trusted partner in establishing and running a successful business.</p>
+    </div>
+    <div>
+      <h4 class="footer-heading font-mono">Services</h4>
+      <ul class="footer-list"><li>Business Operations</li><li>IT Solutions</li><li>Hiring Services</li><li>Payroll Services</li><li>SAP Services</li><li>Shared Workspaces</li></ul>
+    </div>
+    <div>
+      <h4 class="footer-heading font-mono">Company</h4>
+      <ul class="footer-list"><li>About Us</li><li>Success Stories</li><li>Careers</li><li>Contact</li><li>Privacy Policy</li></ul>
+    </div>
+    <div>
+      <h4 class="footer-heading font-mono">Contact</h4>
+      <ul class="footer-list"><li>+91 40 3500 9631</li><li>hello@opslogic.team</li><li>Hyderabad, Telangana, India</li><li>Scarborough, Ontario, Canada</li></ul>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025–2026 OpsLogic Private Limited</div>
+</footer>
+
+<a href="#contact" class="btn btn-orange float-cta magnetic">💬 Book a call</a>
+
+<script>
+  // cursor glow
+  const glow = document.getElementById('cursor-glow');
+  window.addEventListener('mousemove', (e)=>{
+    glow.style.opacity = '1';
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  });
+  window.addEventListener('mouseleave', ()=>{ glow.style.opacity = '0'; });
+
+  // magnetic buttons
+  document.querySelectorAll('.magnetic').forEach(btn=>{
+    btn.addEventListener('mousemove', (e)=>{
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width/2;
+      const y = e.clientY - r.top - r.height/2;
+      btn.style.transform = `translate(${x*0.18}px, ${y*0.28}px)`;
+    });
+    btn.addEventListener('mouseleave', ()=>{ btn.style.transform = ''; });
+  });
+
+  // scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold:0.15 });
+  revealEls.forEach(el=>io.observe(el));
+
+  // build your stack
+  const pickGrid = document.getElementById('pickGrid');
+  const summaryList = document.getElementById('summaryList');
+  pickGrid.addEventListener('change', ()=>{
+    const checked = [...pickGrid.querySelectorAll('input:checked')];
+    pickGrid.querySelectorAll('.pick-chip').forEach(chip=>{
+      chip.classList.toggle('active', chip.querySelector('input').checked);
+    });
+    if(checked.length === 0){
+      summaryList.innerHTML = '<div class="empty">Nothing picked yet — tick a few boxes 👈</div>';
+      return;
+    }
+    summaryList.innerHTML = checked.map(c=>`<div class="summary-item"><span>${c.value}</span><span>✓</span></div>`).join('');
+  });
+
+  // animated counters
+  const counters = document.querySelectorAll('.count');
+  const cio = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        const suffix = el.dataset.suffix || '';
+        let current = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const tick = ()=>{
+          current += step;
+          if(current >= target){ el.textContent = target + suffix; return; }
+          el.textContent = current + suffix;
+          requestAnimationFrame(tick);
+        };
+        tick();
+        cio.unobserve(el);
+      }
+    });
+  }, { threshold:0.5 });
+  counters.forEach(c=>cio.observe(c));
+
+  // accordion
+  document.querySelectorAll('.accordion-item').forEach(item=>{
+    const btn = item.querySelector('.accordion-btn');
+    const panel = item.querySelector('.accordion-panel');
+    if(item.classList.contains('open')){ panel.style.maxHeight = panel.scrollHeight + 'px'; }
+    btn.addEventListener('click', ()=>{
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.accordion-item').forEach(i=>{
+        i.classList.remove('open');
+        i.querySelector('.accordion-panel').style.maxHeight = null;
+      });
+      if(!isOpen){
+        item.classList.add('open');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

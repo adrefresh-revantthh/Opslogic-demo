@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OpsLogic — The Operations Board</title>
+<meta name="description" content="OpsLogic sets up and runs the operations, IT, hiring, payroll and SAP work behind a growing business." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   OPSLOGIC — "The Operations Board"
+   Corkboard / pinned-notes metaphor. Pure CSS.
+   Palette: blue, orange, black, white, gray only.
+   ========================================================= */
+
+:root{
+  --black:#0B0C10;
+  --ink-2:#15171D;
+  --gray:#7C8591;
+  --gray-lt:#DADFE5;
+  --board-bg:#EEF0F3;
+  --hairline:rgba(11,12,16,0.12);
+  --white:#FCFCFA;
+  --blue:#1CA7E0;
+  --orange:#FF8A1E;
+
+  --font-display:'Bricolage Grotesque', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'JetBrains Mono', monospace;
+  --font-hand:'Caveat', cursive;
+
+  --ease:cubic-bezier(.16,.84,.32,1);
+  --nav-h:76px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; }
+
+body{
+  background:var(--board-bg);
+  color:var(--black);
+  font-family:var(--font-body);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  cursor:none;
+}
+@media (hover:none), (pointer:coarse){ body{ cursor:auto; } }
+
+a{ color:inherit; text-decoration:none; }
+ul{ list-style:none; }
+button{ font:inherit; background:none; border:none; cursor:none; color:inherit; }
+@media (hover:none), (pointer:coarse){ button{ cursor:pointer; } }
+:focus-visible{ outline:2px solid var(--blue); outline-offset:3px; }
+
+/* ---------------- ambient drifting background blobs (site-wide) ---------------- */
+.bg-blobs{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bg-blob{ position:absolute; border-radius:50%; filter:blur(60px); opacity:0.16; animation:drift 22s ease-in-out infinite; }
+.bg-blob--1{ width:420px; height:420px; background:var(--blue); top:-8%; left:-10%; animation-duration:26s; }
+.bg-blob--2{ width:360px; height:360px; background:var(--orange); top:40%; right:-8%; animation-duration:20s; animation-delay:-6s; }
+.bg-blob--3{ width:300px; height:300px; background:var(--blue); bottom:-6%; left:30%; animation-duration:24s; animation-delay:-12s; }
+@keyframes drift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  33%{ transform:translate(40px,-30px) scale(1.08); }
+  66%{ transform:translate(-30px,25px) scale(0.94); }
+}
+@media (prefers-reduced-motion: reduce){ .bg-blob{ animation:none; } }
+@media (max-width:700px){ .bg-blobs{ display:none; } }
+
+/* reusable glass surface */
+.glass{ background:rgba(252,252,250,0.6); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.5); }
+.glass-dark{ background:rgba(11,12,16,0.55); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(255,255,255,0.08); }
+
+.eyebrow{
+  font-family:var(--font-mono); font-size:12px; text-transform:uppercase;
+  letter-spacing:0.14em; color:var(--gray); display:inline-block;
+}
+
+/* ---------------- custom cursor ---------------- */
+.cursor-dot, .cursor-ring{ position:fixed; top:0; left:0; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); will-change:transform; }
+.cursor-dot{ width:6px; height:6px; border-radius:50%; background:var(--black); }
+.cursor-ring{ width:38px; height:38px; border-radius:50%; border:1.5px solid var(--black); display:flex; align-items:center; justify-content:center; transition:width .3s var(--ease), height .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease); }
+.cursor-ring #cursorLabel{ font-family:var(--font-mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase; opacity:0; transition:opacity .2s ease; white-space:nowrap; color:var(--white); }
+.cursor-ring.is-hover{ width:64px; height:64px; background:var(--black); border-color:var(--black); }
+.cursor-ring.is-hover #cursorLabel{ opacity:1; }
+.cursor-ring.is-magnetic{ width:52px; height:52px; background:var(--orange); border-color:var(--orange); }
+.cursor-ring.is-dragging{ width:70px; height:70px; background:var(--blue); border-color:var(--blue); }
+@media (hover:none), (pointer:coarse){ .cursor-dot, .cursor-ring{ display:none; } }
+
+/* ---------------- scroll progress ---------------- */
+.scroll-progress{ position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--blue),var(--orange)); z-index:9998; transition:width .1s linear; }
+
+/* ---------------- reveal animation ---------------- */
+.reveal-up, .reveal-left, .reveal-right, .reveal-scale{ opacity:0; transition:opacity .8s var(--ease), transform .8s var(--ease); transition-delay:calc(var(--d, 0) * 0.1s); }
+.reveal-up{ transform:translateY(36px); }
+.reveal-left{ transform:translate(-50px,10px) rotate(-3deg); }
+.reveal-right{ transform:translate(50px,10px) rotate(3deg); }
+.reveal-scale{ transform:scale(0.8) rotate(var(--rot, -6deg)); }
+.reveal-up.in{ opacity:1; transform:translateY(0); }
+.reveal-left.in, .reveal-right.in{ opacity:1; transform:translate(0,0) rotate(0deg); }
+.reveal-scale.in{ opacity:1; transform:scale(1) rotate(var(--rot, 0deg)); }
+@media (prefers-reduced-motion: reduce){
+  .reveal-up, .reveal-left, .reveal-right, .reveal-scale{ opacity:1; transform:none; transition:none; }
+}
+
+/* ---------------- shared: pins, tape, board texture ---------------- */
+.pin{ position:absolute; top:-9px; left:50%; transform:translateX(-50%); width:16px; height:16px; border-radius:50%; z-index:5; box-shadow:0 3px 5px rgba(11,12,16,0.35); }
+.pin::after{ content:""; position:absolute; inset:3px; border-radius:50%; background:rgba(255,255,255,0.55); }
+.pin--blue{ background:radial-gradient(circle at 35% 30%, #6cd0ff, var(--blue)); }
+.pin--orange{ background:radial-gradient(circle at 35% 30%, #ffb066, var(--orange)); }
+.pin--sm{ width:12px; height:12px; top:-7px; }
+.pin--lg{ width:22px; height:22px; top:-13px; }
+
+.tape{ position:absolute; width:90px; height:30px; background:rgba(255,255,255,0.55); border:1px solid rgba(11,12,16,0.08); box-shadow:0 4px 10px rgba(11,12,16,0.1); z-index:4; }
+.tape--1{ top:6%; left:22%; transform:rotate(-8deg); }
+.tape--2{ bottom:10%; right:14%; transform:rotate(6deg); }
+
+.board-texture{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:radial-gradient(var(--hairline) 1.4px, transparent 1.4px);
+  background-size:26px 26px;
+  mask-image:radial-gradient(ellipse 90% 80% at 50% 40%, black 40%, transparent 90%);
+}
+
+/* ---------------- NAV ---------------- */
+.nav{ position:fixed; top:0; left:0; right:0; z-index:200; height:var(--nav-h); display:flex; align-items:center; background:rgba(238,240,243,0.75); backdrop-filter:blur(10px); border-bottom:1px solid transparent; transition:border-color .3s ease, background .3s ease; }
+.nav.scrolled{ border-color:var(--hairline); background:rgba(238,240,243,0.94); }
+.nav-inner{ width:100%; max-width:1360px; margin:0 auto; padding:0 32px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.nav-logo{ display:flex; align-items:center; gap:10px; }
+.nav-logo-pin{ width:14px; height:14px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffb066, var(--orange)); box-shadow:0 2px 4px rgba(11,12,16,0.3); }
+.nav-logo-text{ font-family:var(--font-display); font-weight:700; font-size:16px; letter-spacing:0.03em; }
+
+.nav-links{ display:flex; gap:36px; font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:0.06em; }
+.nav-links a{ position:relative; padding:6px 0; }
+.nav-links a::after{ content:""; position:absolute; left:0; bottom:0; width:0; height:1.5px; background:var(--orange); transition:width .3s var(--ease); }
+.nav-links a:hover::after{ width:100%; }
+
+.nav-cta{ display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--black); border-radius:999px; padding:10px 20px; font-size:13px; font-weight:600; transition:background .25s ease, color .25s ease; }
+.nav-cta:hover{ background:var(--black); color:var(--white); }
+
+.nav-burger{ display:none; flex-direction:column; gap:5px; width:28px; }
+.nav-burger span{ height:2px; background:var(--black); border-radius:2px; transition:transform .3s ease; }
+.nav-burger.is-open span:first-child{ transform:translateY(3.5px) rotate(45deg); }
+.nav-burger.is-open span:last-child{ transform:translateY(-3.5px) rotate(-45deg); }
+@media (max-width:900px){ .nav-links, .nav-cta{ display:none; } .nav-burger{ display:flex; } }
+
+.mobile-menu{ position:fixed; inset:var(--nav-h) 0 0 0; background:var(--board-bg); z-index:150; display:flex; flex-direction:column; padding:32px; gap:8px; transform:translateY(-8px); opacity:0; pointer-events:none; transition:opacity .3s ease, transform .3s ease; }
+.mobile-menu.is-open{ opacity:1; transform:translateY(0); pointer-events:auto; }
+.mobile-menu a{ font-family:var(--font-display); font-size:30px; font-weight:600; padding:14px 0; border-bottom:1px solid var(--hairline); }
+
+/* ---------------- board section base ---------------- */
+.board{ position:relative; max-width:1360px; margin:0 auto; padding:0 32px; }
+
+/* ---------------- HERO ---------------- */
+.board--hero{ min-height:100vh; padding-top:calc(var(--nav-h) + 40px); padding-bottom:80px; display:flex; align-items:center; }
+
+@keyframes drop-in{
+  from{ opacity:0; transform:translateY(30px) rotate(var(--rot, 0deg)); }
+  to{ opacity:1; transform:translateY(0) rotate(var(--rot, 0deg)); }
+}
+
+.poster{
+  position:relative; background:var(--white); border-radius:10px; padding:56px 64px 64px;
+  max-width:760px; --rot:-1.2deg; box-shadow:0 30px 60px -20px rgba(11,12,16,0.25);
+  border-bottom:5px solid var(--gray-lt);
+  animation:drop-in .7s var(--ease) both;
+}
+.poster-kicker{ display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); margin-bottom:22px; }
+.kicker-dot{ width:6px; height:6px; border-radius:50%; background:var(--orange); animation:kicker-pulse 1.6s ease-in-out infinite; }
+@keyframes kicker-pulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:0.4; transform:scale(0.7); } }
+
+.poster-headline{ font-family:var(--font-display); font-weight:800; }
+.poster-headline .line{ display:block; font-size:clamp(38px, 6.6vw, 84px); line-height:0.98; letter-spacing:-0.02em; }
+.headline-block{ background:var(--blue); color:var(--white); padding:2px 16px 8px; border-radius:8px; display:inline-block; transform:rotate(-1deg); }
+.headline-dot{ color:var(--orange); }
+
+.poster-sub{ margin-top:24px; max-width:480px; font-size:17px; color:var(--gray); }
+.poster-actions{ margin-top:34px; display:flex; flex-wrap:wrap; align-items:center; gap:24px; }
+
+.btn-stamp{
+  display:inline-flex; align-items:center; justify-content:center; background:var(--black); color:var(--white);
+  padding:16px 30px; border-radius:999px; font-weight:700; font-size:14px; letter-spacing:0.02em;
+  border:2px solid var(--black); transition:background .25s ease, color .25s ease; text-transform:uppercase;
+}
+.btn-stamp:hover{ background:var(--orange); border-color:var(--orange); color:var(--black); }
+
+.btn-underline-link{ font-weight:600; font-size:14px; position:relative; padding-bottom:3px; }
+.btn-underline-link::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:1.5px; background:var(--black); transform:scaleX(1); transform-origin:left; transition:transform .3s var(--ease); }
+.btn-underline-link:hover::after{ transform:scaleX(0); transform-origin:right; }
+
+@keyframes note-bob{ 0%,100%{ transform:translateY(0) rotate(var(--rot,0deg)); } 50%{ transform:translateY(-8px) rotate(var(--rot,0deg)); } }
+
+.sticky-note{
+  position:absolute; font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; font-weight:600;
+  background:var(--white); border:1px solid var(--hairline); border-radius:2px; padding:14px 16px 14px 20px;
+  box-shadow:6px 8px 16px -6px rgba(11,12,16,0.25); z-index:3;
+  opacity:0; animation:drop-in .6s var(--ease) both, note-bob 4.5s ease-in-out infinite;
+}
+.note--1{ top:8%; right:20%; --rot:6deg; animation-delay:0.3s, 1.1s; }
+.note--2{ top:22%; right:2%; --rot:-4deg; animation-delay:0.45s, 1.4s; background:rgba(252,252,250,0.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.6); }
+.note--3{ top:66%; right:22%; --rot:3deg; animation-delay:0.6s, 1.7s; }
+.note--4{ top:78%; right:4%; --rot:-6deg; animation-delay:0.75s, 2s; }
+@media (max-width:1000px){ .sticky-note{ display:none; } }
+
+.tape--3{ top:44%; right:0; transform:rotate(-90deg) translateX(50%); }
+
+.loose-pin{ position:absolute; width:10px; height:10px; border-radius:50%; z-index:2; opacity:0; animation:drop-in .5s var(--ease) both; }
+.loose-pin::after{ content:none; }
+.loose-pin--1{ background:var(--blue); top:16%; right:44%; animation-delay:1.3s; }
+.loose-pin--2{ background:var(--orange); top:48%; right:8%; animation-delay:1.5s; }
+.loose-pin--3{ background:var(--gray); top:58%; right:36%; animation-delay:1.7s; }
+.loose-pin--4{ background:var(--orange); top:88%; right:38%; animation-delay:1.9s; }
+@media (max-width:1000px){ .loose-pin{ display:none; } }
+
+.hero-web{ position:absolute; inset:0; width:100%; height:100%; z-index:1; opacity:0; animation:fade-in .8s ease 1.6s both; }
+@keyframes fade-in{ to{ opacity:0.7; } }
+@media (max-width:1000px){ .hero-web{ display:none; } }
+
+.flow-card{ display:none; } /* deprecated in favor of .dash-card */
+
+.dash-card{
+  position:absolute; top:44%; right:5%; width:270px; padding:22px 24px 24px; border-radius:16px; z-index:3;
+  --rot:1.5deg; opacity:0; animation:drop-in .6s var(--ease) 1.05s both, note-bob 6s ease-in-out 1.7s infinite;
+  background:rgba(252,252,250,0.55); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.6); box-shadow:0 24px 48px -20px rgba(11,12,16,0.3);
+}
+.dash-card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.dash-live{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.08em; color:var(--orange); }
+.dash-live-dot{ width:6px; height:6px; border-radius:50%; background:var(--orange); animation:kicker-pulse 1.6s ease-in-out infinite; }
+.dash-card-eyebrow{ font-family:var(--font-mono); font-size:9px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray); }
+
+.dash-bars{ display:flex; align-items:flex-end; gap:8px; height:64px; margin-bottom:16px; }
+.dash-bar{ flex:1; height:var(--h); background:var(--c); border-radius:3px 3px 0 0; opacity:0.85; animation:bar-grow 1s var(--ease) both; animation-delay:calc(1.3s + var(--i, 0) * 0.08s); }
+.dash-bars .dash-bar:nth-child(1){ --i:0; } .dash-bars .dash-bar:nth-child(2){ --i:1; }
+.dash-bars .dash-bar:nth-child(3){ --i:2; } .dash-bars .dash-bar:nth-child(4){ --i:3; }
+.dash-bars .dash-bar:nth-child(5){ --i:4; } .dash-bars .dash-bar:nth-child(6){ --i:5; }
+@keyframes bar-grow{ from{ transform:scaleY(0); } to{ transform:scaleY(1); } }
+.dash-bar{ transform-origin:bottom; }
+
+.dash-row{ display:flex; align-items:center; justify-content:space-between; font-family:var(--font-mono); font-size:11px; color:var(--black); padding:7px 0; border-top:1px solid rgba(11,12,16,0.08); }
+.dash-pill{ background:rgba(34,197,94,0.15); color:#1c8a4f; padding:2px 9px; border-radius:999px; font-weight:600; font-size:10px; }
+.dash-pill--blue{ background:rgba(28,167,224,0.15); color:var(--blue-2, #0e7fb0); }
+.dash-sparkline{ width:100%; height:28px; margin-top:12px; opacity:0; animation:fade-in .8s ease 2.1s both; }
+@media (max-width:1100px){ .dash-card{ display:none; } }
+
+.badge-stamp{
+  position:absolute; top:6%; right:2%; width:96px; height:96px; border:2px dashed var(--orange); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; text-align:center; font-family:var(--font-mono);
+  font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--orange);
+  opacity:0; animation:drop-in .6s var(--ease) .9s both, spin-slow 18s linear infinite;
+}
+@keyframes spin-slow{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@media (max-width:1100px){ .badge-stamp{ display:none; } }
+
+.hero-arrow{ position:absolute; z-index:2; opacity:0; animation:drop-in .6s var(--ease) 1.1s both; }
+.hero-arrow path{ stroke-dasharray:5 6; animation:arrow-dash 2.6s linear infinite; }
+@keyframes arrow-dash{ to{ stroke-dashoffset:-90; } }
+@media (max-width:900px){ .hero-arrow{ display:none; } }
+
+.card-torn{
+  position:absolute; bottom:8%; left:4%; background:var(--black); color:var(--white); padding:18px 24px;
+  border-radius:6px; --rot:4deg; box-shadow:0 16px 30px -14px rgba(11,12,16,0.4);
+  opacity:0; animation:drop-in .6s var(--ease) .5s both;
+}
+.card-torn-label{ font-family:var(--font-display); font-weight:700; font-size:14px; }
+@media (max-width:900px){ .card-torn{ display:none; } }
+
+@media (prefers-reduced-motion: reduce){
+  .poster, .sticky-note, .badge-stamp, .hero-arrow, .card-torn, .dash-card, .dash-bar, .dash-sparkline, .hero-web, .loose-pin, .bg-blob{ animation:none !important; opacity:1 !important; transform:rotate(var(--rot,0deg)) !important; }
+}
+
+/* ---------------- MARQUEE ---------------- */
+.marquee-strip{ border-top:1.5px solid var(--black); border-bottom:1.5px solid var(--black); overflow:hidden; padding:16px 0; background:var(--white); }
+.marquee-track{ display:flex; width:max-content; gap:20px; align-items:center; font-family:var(--font-display); font-weight:700; font-size:18px; text-transform:uppercase; color:var(--black); animation:marquee-scroll 28s linear infinite; }
+.marquee-track .sep{ color:var(--orange); font-size:12px; }
+@keyframes marquee-scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+@media (prefers-reduced-motion: reduce){ .marquee-track{ animation:none; } }
+
+/* ---------------- ABOUT ---------------- */
+.board--about{ padding-top:120px; padding-bottom:120px; display:grid; grid-template-columns:0.9fr 1.1fr; gap:56px; align-items:start; }
+@media (max-width:900px){ .board--about{ grid-template-columns:1fr; } }
+
+.note-clip{ position:relative; background:var(--white); padding:44px 36px 36px; border-radius:2px; transform:rotate(-1.5deg); box-shadow:0 20px 40px -18px rgba(11,12,16,0.25); }
+.clip{ position:absolute; top:-16px; left:50%; transform:translateX(-50%); width:44px; height:26px; border:4px solid var(--gray); border-bottom:none; border-radius:8px 8px 0 0; }
+.note-clip-tag{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--gray); }
+.note-clip-body{ font-family:var(--font-display); font-weight:700; font-size:clamp(24px,3vw,32px); line-height:1.2; margin-top:16px; letter-spacing:-0.01em; }
+.handwritten{ font-family:var(--font-hand); font-weight:700; color:var(--blue); font-size:1.3em; display:inline-block; margin-top:6px; }
+
+.about-copy-block{ padding-top:24px; }
+.about-copy-block p{ font-size:17px; color:var(--gray); max-width:440px; margin-bottom:18px; }
+
+.index-card-stats{ grid-column:1 / -1; display:flex; gap:24px; flex-wrap:wrap; margin-top:24px; }
+.index-card{
+  position:relative; background:var(--white); border:1px solid var(--hairline); border-radius:4px; padding:24px 28px;
+  transform:rotate(var(--rot, 0deg)); box-shadow:0 14px 26px -14px rgba(11,12,16,0.2); transition:transform .3s ease;
+}
+.index-card:hover{ transform:rotate(0deg) translateY(-4px); }
+.stat-num{ font-family:var(--font-display); font-weight:800; font-size:42px; color:var(--blue); }
+.stat-label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gray); margin-top:4px; }
+
+/* ---------------- SERVICES: detective board ---------------- */
+.board--services{ padding:0 32px 140px; }
+.section-head h2{ font-family:var(--font-display); font-weight:700; font-size:clamp(28px,4vw,42px); margin-top:12px; letter-spacing:-0.01em; }
+.section-head--dark .eyebrow{ color:var(--gray-lt); }
+.section-head--dark h2{ color:var(--white); }
+
+.detective-board{
+  position:relative; margin-top:56px; height:560px; border-radius:16px;
+  border:1px solid var(--hairline); box-shadow:0 30px 60px -30px rgba(11,12,16,0.3); overflow:hidden;
+  background:
+    repeating-linear-gradient(135deg, rgba(11,12,16,0.025) 0px, rgba(11,12,16,0.025) 1px, transparent 1px, transparent 22px),
+    var(--white);
+}
+.string-svg{ position:absolute; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+
+.board-hub{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:120px; height:120px; border-radius:50%;
+  background:var(--black); color:var(--white); display:flex; align-items:center; justify-content:center; text-align:center;
+  font-family:var(--font-display); font-weight:700; font-size:14px; letter-spacing:0.03em; z-index:2;
+  box-shadow:0 20px 40px -16px rgba(11,12,16,0.5);
+}
+.board-hub-pin{ display:none; }
+
+.board-note{
+  position:absolute; width:168px; background:var(--white); border:1px solid var(--hairline); border-radius:4px;
+  padding:16px 16px 18px; text-align:left; transform:translate(-50%,-50%) rotate(var(--rot, 0deg)); z-index:3;
+  box-shadow:6px 10px 20px -8px rgba(11,12,16,0.3); transition:box-shadow .2s ease, border-color .2s ease;
+  touch-action:none;
+}
+.board-note:hover{ border-color:var(--orange); }
+.board-note.is-active{ border-color:var(--orange); box-shadow:0 0 0 3px rgba(255,138,30,0.2), 6px 10px 20px -8px rgba(11,12,16,0.3); }
+.board-note.is-dragging{ cursor:grabbing; z-index:6; box-shadow:0 24px 40px -14px rgba(11,12,16,0.4); }
+.board-note-num{ display:block; font-family:var(--font-mono); font-size:10px; color:var(--gray); margin-bottom:4px; }
+.board-note-name{ font-family:var(--font-display); font-weight:700; font-size:14px; }
+
+.board-detail{
+  margin-top:28px; background:var(--white); border:1px solid var(--hairline); border-radius:12px; padding:24px 28px;
+  border-left:4px solid var(--orange);
+}
+.board-detail-eyebrow{ font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--orange); }
+.board-detail p{ margin-top:8px; font-size:15px; color:var(--gray); max-width:600px; }
+
+@media (max-width:640px){
+  .detective-board{ height:640px; }
+  .board-note{ width:130px; padding:12px; }
+  .board-note-name{ font-size:12px; }
+  .board-hub{ width:96px; height:96px; font-size:12px; }
+}
+
+/* ---------------- WHY: fan of cards ---------------- */
+.board--why{ padding:0 32px 150px; text-align:center; }
+.fan-wrap{ margin-top:56px; display:flex; flex-direction:column; align-items:center; gap:20px; }
+.fan-stack{ position:relative; width:100%; max-width:420px; height:280px; }
+.fan-card{
+  position:absolute; inset:0; background:var(--white); border:2px solid var(--black); border-top:6px solid var(--accent, var(--blue));
+  border-radius:14px; padding:32px; text-align:left; transition:transform .5s var(--ease), box-shadow .5s ease;
+  box-shadow:0 16px 30px -18px rgba(11,12,16,0.25); cursor:pointer;
+}
+.fan-card.is-front{ box-shadow:0 30px 50px -18px rgba(11,12,16,0.35); }
+.fan-num{ font-family:var(--font-mono); font-size:12px; color:var(--gray); display:block; margin-bottom:10px; }
+.fan-card h3{ font-family:var(--font-display); font-weight:700; font-size:22px; margin-bottom:10px; }
+.fan-card p{ color:var(--gray); font-size:14px; }
+.fan-hint{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); }
+
+/* ---------------- WORK: polaroid clothesline ---------------- */
+.board--work{ background:var(--black); color:var(--white); max-width:none; padding:130px 32px; position:relative; overflow:hidden; }
+.board--work::before{
+  content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,0.06) 1.5px, transparent 1.5px);
+  background-size:28px 28px;
+}
+.board--work .section-head{ max-width:1360px; margin:0 auto 60px; position:relative; z-index:1; }
+
+.clothesline-wrap{ position:relative; z-index:1; max-width:1360px; margin:0 auto; overflow-x:auto; padding-bottom:12px; }
+.clothesline-svg{ width:100%; height:24px; display:block; }
+.clothesline-track{ display:flex; gap:56px; padding:0 20px 20px; margin-top:-6px; }
+
+.polaroid{
+  flex:0 0 220px; background:#fff; padding:14px 14px 40px; position:relative; transform:rotate(var(--rot,0deg));
+  box-shadow:0 20px 34px -16px rgba(0,0,0,0.5); transition:transform .3s ease;
+}
+.polaroid:hover{ transform:rotate(0deg) translateY(-6px); }
+.clothespin{ position:absolute; top:-14px; left:50%; transform:translateX(-50%); width:14px; height:22px; background:var(--gray); border-radius:3px; }
+.polaroid-photo{ width:100%; aspect-ratio:1/1; background:linear-gradient(135deg, var(--blue), var(--orange)); }
+.polaroid-photo--2{ background:linear-gradient(135deg, var(--orange), var(--black)); }
+.polaroid-photo--3{ background:linear-gradient(135deg, var(--gray), var(--blue)); }
+.polaroid-photo--4{ background:linear-gradient(135deg, var(--black), var(--orange)); }
+.polaroid-caption{ font-family:var(--font-hand); font-weight:700; font-size:19px; color:var(--black); text-align:center; margin-top:12px; line-height:1.25; }
+.polaroid-caption span{ font-family:var(--font-mono); font-size:11px; font-weight:400; color:var(--gray); text-transform:none; display:block; margin-top:2px; }
+
+/* ---------------- CTA ---------------- */
+.board--cta{ padding:0 32px 140px; display:flex; justify-content:center; }
+.cta-poster{
+  position:relative; background:var(--white); border-radius:8px; padding:80px 48px; text-align:center; max-width:900px; width:100%;
+  transform:rotate(0.6deg); box-shadow:0 34px 70px -24px rgba(11,12,16,0.3);
+}
+.cta-headline .line{ display:block; font-family:var(--font-display); font-weight:800; font-size:clamp(34px,7vw,72px); line-height:1; letter-spacing:-0.02em; }
+.cta-headline .accent{ color:var(--orange); }
+.stamp-btn{
+  display:inline-block; margin-top:36px; border:3px solid var(--black); border-radius:999px; padding:18px 34px;
+  font-family:var(--font-mono); font-weight:700; font-size:14px; letter-spacing:0.06em; transform:rotate(-3deg);
+  transition:background .25s ease, color .25s ease, transform .25s ease;
+}
+.stamp-btn:hover{ background:var(--black); color:var(--white); transform:rotate(0deg); }
+.cta-note{ margin-top:22px; color:var(--gray); font-size:14px; }
+
+/* ---------------- FOOTER ---------------- */
+.footer{ background:var(--black); color:var(--white); padding:72px 32px 28px; }
+.footer-top{ max-width:1360px; margin:0 auto; border-bottom:1px solid rgba(255,255,255,0.12); padding-bottom:44px; margin-bottom:44px; }
+.footer-logo{ font-family:var(--font-display); font-weight:800; font-size:clamp(32px,5.5vw,58px); letter-spacing:-0.02em; }
+.footer-statement{ color:var(--gray-lt); margin-top:12px; max-width:420px; }
+.footer-grid{ max-width:1360px; margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:32px; }
+@media (max-width:700px){ .footer-grid{ grid-template-columns:1fr 1fr; } }
+.footer-grid h4{ font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--gray); margin-bottom:14px; }
+.footer-grid li{ font-size:14px; color:var(--gray-lt); margin-bottom:9px; }
+.footer-bottom{ max-width:1360px; margin:48px auto 0; padding-top:22px; border-top:1px solid rgba(255,255,255,0.12); display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:12px; color:var(--gray); }
+@media (max-width:600px){ .footer-bottom{ flex-direction:column; gap:8px; } }
+
+</style>
+</head>
+<body>
+
+<div class="bg-blobs" aria-hidden="true">
+  <span class="bg-blob bg-blob--1"></span>
+  <span class="bg-blob bg-blob--2"></span>
+  <span class="bg-blob bg-blob--3"></span>
+</div>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"><span id="cursorLabel"></span></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="siteNav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo" data-cursor="">
+      <span class="nav-logo-pin"></span>
+      <span class="nav-logo-text">OPSLOGIC</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#about" data-cursor="">About</a>
+      <a href="#services" data-cursor="">Services</a>
+      <a href="#work" data-cursor="">Work</a>
+      <a href="#contact" data-cursor="">Contact</a>
+      <a href="index.html" data-cursor="" style="color:var(--orange);">Home Demo</a>
+      <a href="template-1.html" data-cursor="" style="color:var(--orange);">Template 1</a>
+    </nav>
+    <a href="#contact" class="nav-cta magnetic" data-cursor="">
+      <span>Let's talk</span>
+    </a>
+    <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#work">Work</a>
+  <a href="#contact">Contact</a>
+  <a href="index.html">Home Demo</a>
+  <a href="template-1.html">Template 1</a>
+</div>
+
+<main id="top">
+
+  <!-- ================= HERO — pinned poster on a board ================= -->
+  <section class="board board--hero" id="hero">
+    <div class="board-texture" aria-hidden="true"></div>
+
+    <!-- loose scattered ephemera -->
+    <div class="sticky-note note--1"><span class="pin pin--sm pin--blue"></span>OPERATIONS</div>
+    <div class="sticky-note note--2"><span class="pin pin--sm pin--orange"></span>IT &amp; SAP</div>
+    <div class="sticky-note note--3"><span class="pin pin--sm pin--blue"></span>PAYROLL</div>
+    <div class="sticky-note note--4"><span class="pin pin--sm pin--orange"></span>HIRING</div>
+    <div class="tape tape--1" aria-hidden="true"></div>
+    <div class="tape tape--2" aria-hidden="true"></div>
+    <div class="tape tape--3" aria-hidden="true"></div>
+    <div class="badge-stamp" aria-hidden="true">★ Est. Hyderabad ★</div>
+
+    <!-- loose pin dots for texture -->
+    <span class="loose-pin loose-pin--1"></span>
+    <span class="loose-pin loose-pin--2"></span>
+    <span class="loose-pin loose-pin--3"></span>
+    <span class="loose-pin loose-pin--4"></span>
+
+    <!-- dashed connective lines between scattered notes -->
+    <svg class="hero-web" viewBox="0 0 1360 620" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M700,150 C820,170 900,120 1000,100" fill="none" stroke="#7C8591" stroke-width="1.5" stroke-dasharray="4 6"/>
+      <path d="M1030,150 C1000,220 980,260 1060,300" fill="none" stroke="#7C8591" stroke-width="1.5" stroke-dasharray="4 6"/>
+      <path d="M900,340 C860,390 840,420 900,460" fill="none" stroke="#7C8591" stroke-width="1.5" stroke-dasharray="4 6"/>
+    </svg>
+
+    <!-- animated glass "operations dashboard" panel — the anchor for the right half -->
+    <div class="dash-card">
+      <div class="dash-card-head">
+        <span class="dash-live"><span class="dash-live-dot"></span>Live</span>
+        <span class="dash-card-eyebrow">Operations snapshot</span>
+      </div>
+      <div class="dash-bars">
+        <div class="dash-bar" style="--h:38%; --c:var(--blue);"></div>
+        <div class="dash-bar" style="--h:64%; --c:var(--orange);"></div>
+        <div class="dash-bar" style="--h:52%; --c:var(--blue);"></div>
+        <div class="dash-bar" style="--h:80%; --c:var(--orange);"></div>
+        <div class="dash-bar" style="--h:46%; --c:var(--blue);"></div>
+        <div class="dash-bar" style="--h:70%; --c:var(--orange);"></div>
+      </div>
+      <div class="dash-row"><span>Payroll cycle</span><span class="dash-pill">On track</span></div>
+      <div class="dash-row"><span>IT uptime</span><span class="dash-pill dash-pill--blue">99.9%</span></div>
+      <svg class="dash-sparkline" viewBox="0 0 200 40" preserveAspectRatio="none"><path d="M0,30 L30,20 L60,26 L90,10 L120,18 L150,6 L200,14" fill="none" stroke="var(--orange)" stroke-width="2"/></svg>
+    </div>
+
+    <svg class="hero-arrow" style="top:66%; left:38%; width:220px; height:100px;" viewBox="0 0 220 100" aria-hidden="true">
+      <path d="M10,14 C90,4 150,70 208,58" fill="none" stroke="#FF8A1E" stroke-width="2.5"/>
+      <path d="M190,46 L210,58 L192,72" fill="none" stroke="#FF8A1E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- the main pinned poster -->
+    <div class="poster" id="heroPoster">
+      <span class="pin pin--lg pin--orange" style="left:8%;"></span>
+      <span class="pin pin--lg pin--blue" style="right:8%;"></span>
+
+      <div class="poster-kicker">
+        <span class="kicker-dot"></span> Operations partner · Est. Hyderabad
+      </div>
+
+      <h1 class="poster-headline" id="heroHeadline">
+        <span class="line" id="scrambleLine1">WE MAKE</span>
+        <span class="line accent"><span class="headline-block" id="scrambleLine2">BUSINESS</span></span>
+        <span class="line"><span id="scrambleLine3">MOVE</span><span class="headline-dot">.</span></span>
+      </h1>
+
+      <p class="poster-sub">
+        OpsLogic sets up and runs the operations, IT, hiring, payroll and SAP work behind a growing business — one accountable team instead of six vendors.
+      </p>
+
+      <div class="poster-actions">
+        <a href="#contact" class="btn-stamp magnetic" data-cursor="">Start a conversation</a>
+        <a href="#services" class="btn-underline-link" data-cursor="">Pull the board down ↓</a>
+      </div>
+    </div>
+
+    <!-- torn business card, pinned separately -->
+    <div class="card-torn">
+      <span class="pin pin--sm pin--blue"></span>
+      <span class="card-torn-label">Six functions,<br>one team</span>
+    </div>
+  </section>
+
+  <!-- ================= MARQUEE — ticker tape strip ================= -->
+  <div class="marquee-strip">
+    <div class="marquee-track">
+      <span>Adani Cement</span><span class="sep">✕</span><span>Ambuja</span><span class="sep">✕</span><span>DFW</span><span class="sep">✕</span><span>OTM Labs</span><span class="sep">✕</span><span>Orbit</span><span class="sep">✕</span><span>Chemtrade</span><span class="sep">✕</span><span>Audience Group</span><span class="sep">✕</span>
+      <span>Adani Cement</span><span class="sep">✕</span><span>Ambuja</span><span class="sep">✕</span><span>DFW</span><span class="sep">✕</span><span>OTM Labs</span><span class="sep">✕</span><span>Orbit</span><span class="sep">✕</span><span>Chemtrade</span><span class="sep">✕</span><span>Audience Group</span><span class="sep">✕</span>
+    </div>
+  </div>
+
+  <!-- ================= ABOUT — pinned typewritten note ================= -->
+  <section class="board board--about" id="about">
+    <div class="note-clip reveal-left" style="--d:0">
+      <span class="clip" aria-hidden="true"></span>
+      <span class="note-clip-tag">Note to self</span>
+      <p class="note-clip-body">WE DON'T JUST HANDLE OPERATIONS.<br><span class="handwritten">We make them move.</span></p>
+    </div>
+
+    <div class="about-copy-block reveal-right" style="--d:1">
+      <p>Behind every efficient business is a team that knows how operations actually work. OpsLogic builds and manages the systems that drive clarity, consistency and momentum — as one coordinated function instead of scattered vendors.</p>
+      <a href="#contact" class="btn-underline-link" data-cursor="">Read our story →</a>
+    </div>
+
+    <div class="index-card-stats">
+      <div class="index-card reveal-scale" style="--d:2; --rot:-4deg;">
+        <span class="pin pin--sm pin--orange"></span>
+        <div class="stat-num" data-count="9">0</div>
+        <div class="stat-label">Enterprise clients</div>
+      </div>
+      <div class="index-card reveal-scale" style="--d:3; --rot:3deg;">
+        <span class="pin pin--sm pin--blue"></span>
+        <div class="stat-num" data-count="6">0</div>
+        <div class="stat-label">Core services</div>
+      </div>
+      <div class="index-card reveal-scale" style="--d:4; --rot:-2deg;">
+        <span class="pin pin--sm pin--orange"></span>
+        <div class="stat-num" data-count="2">0</div>
+        <div class="stat-label">Countries</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= SERVICES — detective board, drag the notes ================= -->
+  <section class="board board--services" id="services">
+    <div class="section-head reveal-up">
+      <span class="eyebrow">Core Services · Drag a note anywhere</span>
+      <h2>Six functions, pinned to one board.</h2>
+    </div>
+
+    <div class="detective-board" id="detectiveBoard">
+      <svg class="string-svg" id="stringSvg" aria-hidden="true"></svg>
+
+      <div class="board-hub" id="boardHub">
+        <span class="board-hub-pin"></span>
+        OPSLOGIC
+      </div>
+
+      <button class="board-note" data-service="0" data-cursor="DRAG" style="top:14%; left:10%; --rot:-5deg;">
+        <span class="pin pin--sm pin--orange"></span>
+        <span class="board-note-num">01</span>
+        <span class="board-note-name">Business Operations</span>
+      </button>
+
+      <button class="board-note" data-service="1" data-cursor="DRAG" style="top:8%; left:62%; --rot:4deg;">
+        <span class="pin pin--sm pin--blue"></span>
+        <span class="board-note-num">02</span>
+        <span class="board-note-name">IT Solutions</span>
+      </button>
+
+      <button class="board-note" data-service="2" data-cursor="DRAG" style="top:38%; left:78%; --rot:-3deg;">
+        <span class="pin pin--sm pin--orange"></span>
+        <span class="board-note-num">03</span>
+        <span class="board-note-name">Hiring Services</span>
+      </button>
+
+      <button class="board-note" data-service="3" data-cursor="DRAG" style="top:68%; left:66%; --rot:5deg;">
+        <span class="pin pin--sm pin--blue"></span>
+        <span class="board-note-num">04</span>
+        <span class="board-note-name">Payroll Services</span>
+      </button>
+
+      <button class="board-note" data-service="4" data-cursor="DRAG" style="top:72%; left:16%; --rot:-4deg;">
+        <span class="pin pin--sm pin--orange"></span>
+        <span class="board-note-num">05</span>
+        <span class="board-note-name">SAP Services</span>
+      </button>
+
+      <button class="board-note" data-service="5" data-cursor="DRAG" style="top:36%; left:4%; --rot:3deg;">
+        <span class="pin pin--sm pin--blue"></span>
+        <span class="board-note-num">06</span>
+        <span class="board-note-name">Shared Workspace</span>
+      </button>
+    </div>
+
+    <div class="board-detail" id="boardDetail">
+      <span class="board-detail-eyebrow" id="boardDetailEyebrow">01 · Business Operations</span>
+      <p id="boardDetailDesc">Business setup, process design and day-to-day execution — you focus on strategy, we handle the moving parts.</p>
+    </div>
+  </section>
+
+  <!-- ================= WHY OPSLOGIC — fan of index cards ================= -->
+  <section class="board board--why" id="why">
+    <div class="section-head reveal-up">
+      <span class="eyebrow">Why OpsLogic · Tap a card to bring it forward</span>
+      <h2>Three reasons this works.</h2>
+    </div>
+
+    <div class="fan-wrap">
+      <div class="fan-stack" id="fanStack">
+        <button class="fan-card is-front" data-idx="0" style="--accent:#1CA7E0; --rest:-10deg;" data-cursor="">
+          <span class="pin pin--sm pin--blue"></span>
+          <span class="fan-num">01</span>
+          <h3>Results first</h3>
+          <p>We don't measure success by activity. Every engagement is built to solve a real problem and show up as a measurable outcome.</p>
+        </button>
+        <button class="fan-card" data-idx="1" style="--accent:#FF8A1E; --rest:0deg;" data-cursor="">
+          <span class="pin pin--sm pin--orange"></span>
+          <span class="fan-num">02</span>
+          <h3>One team. Multiple expertises.</h3>
+          <p>We act as a true extension of your team — fitting into your workflows and pace instead of imposing our own.</p>
+        </button>
+        <button class="fan-card" data-idx="2" style="--accent:#7C8591; --rest:10deg;" data-cursor="">
+          <span class="pin pin--sm pin--orange"></span>
+          <span class="fan-num">03</span>
+          <h3>Built around your business</h3>
+          <p>Hiring, IT, payroll and SAP under one roof — one aligned team instead of five separate vendors to manage.</p>
+        </button>
+      </div>
+      <p class="fan-hint">Click the top card to cycle through</p>
+    </div>
+  </section>
+
+  <!-- ================= WORK — polaroid clothesline ================= -->
+  <section class="board board--work" id="work">
+    <div class="section-head section-head--dark reveal-up">
+      <span class="eyebrow">Success Stories</span>
+      <h2>Proof, clipped to the line.</h2>
+    </div>
+
+    <div class="clothesline-wrap">
+      <svg class="clothesline-svg" viewBox="0 0 1400 40" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,6 Q350,40 700,10 T1400,6" fill="none" stroke="#7C8591" stroke-width="2"/>
+      </svg>
+
+      <div class="clothesline-track">
+        <div class="polaroid" style="--rot:-4deg;">
+          <span class="clothespin"></span>
+          <div class="polaroid-photo polaroid-photo--1"></div>
+          <p class="polaroid-caption">Adani Cement<br><span>40% faster process turnaround</span></p>
+        </div>
+        <div class="polaroid" style="--rot:3deg;">
+          <span class="clothespin"></span>
+          <div class="polaroid-photo polaroid-photo--2"></div>
+          <p class="polaroid-caption">Ambuja<br><span>99.9% uptime maintained</span></p>
+        </div>
+        <div class="polaroid" style="--rot:-2deg;">
+          <span class="clothespin"></span>
+          <div class="polaroid-photo polaroid-photo--3"></div>
+          <p class="polaroid-caption">OTM Labs<br><span>18-day average time-to-hire</span></p>
+        </div>
+        <div class="polaroid" style="--rot:5deg;">
+          <span class="clothespin"></span>
+          <div class="polaroid-photo polaroid-photo--4"></div>
+          <p class="polaroid-caption">Chemtrade<br><span>Zero compliance escalations</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA — big stamped poster ================= -->
+  <section class="board board--cta" id="contact">
+    <div class="cta-poster">
+      <span class="pin pin--lg pin--orange" style="left:6%;"></span>
+      <span class="pin pin--lg pin--blue" style="right:6%;"></span>
+      <h2 class="cta-headline">
+        <span class="line">LET'S MAKE</span>
+        <span class="line accent">BUSINESS</span>
+        <span class="line">MOVE.</span>
+      </h2>
+      <a href="mailto:hello@opslogic.team" class="stamp-btn magnetic" data-cursor="">
+        <span>START A CONVERSATION</span>
+      </a>
+      <p class="cta-note">No obligations, just a conversation about what's slowing you down.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-logo">OPSLOGIC</div>
+    <p class="footer-statement">Your trusted partner in establishing and running a successful business.</p>
+  </div>
+  <div class="footer-grid">
+    <div>
+      <h4>Services</h4>
+      <ul>
+        <li>Business Operations</li><li>IT Solutions</li><li>Hiring Services</li>
+        <li>Payroll Services</li><li>SAP Services</li><li>Shared Workspace</li>
+      </ul>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <ul><li>About Us</li><li>Success Stories</li><li>Careers</li><li>Contact</li></ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li>+91 40 3500 9631</li>
+        <li>hello@opslogic.team</li>
+        <li>Hyderabad, India</li>
+        <li>Scarborough, Canada</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025–2026 OpsLogic Private Limited</span>
+    <span>Privacy Policy</span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   OPSLOGIC — script.js  ("The Operations Board")
+   Vanilla JS only.
+   ========================================================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+  const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  initNav();
+  initMobileMenu();
+  initScrollProgress();
+  initRevealOnScroll();
+  initCounters();
+  initDetectiveBoard();
+  initFanCards();
+  initScrambleHeadline(prefersReducedMotion);
+
+  if (!isTouch) {
+    initCustomCursor();
+    initMagnetic();
+  }
+});
+
+/* ---------------- Sticky nav background on scroll ---------------- */
+function initNav() {
+  const nav = document.getElementById('siteNav');
+  if (!nav) return;
+  const toggle = () => nav.classList.toggle('scrolled', window.scrollY > 12);
+  toggle();
+  window.addEventListener('scroll', toggle, { passive: true });
+}
+
+/* ---------------- Mobile menu ---------------- */
+function initMobileMenu() {
+  const burger = document.getElementById('navBurger');
+  const menu = document.getElementById('mobileMenu');
+  if (!burger || !menu) return;
+  burger.addEventListener('click', () => {
+    const isOpen = menu.classList.toggle('is-open');
+    burger.classList.toggle('is-open', isOpen);
+    burger.setAttribute('aria-expanded', String(isOpen));
+  });
+  menu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      menu.classList.remove('is-open');
+      burger.classList.remove('is-open');
+      burger.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+/* ---------------- Top scroll progress bar ---------------- */
+function initScrollProgress() {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+  const update = () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+    bar.style.width = pct + '%';
+  };
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+}
+
+/* ---------------- Scroll-triggered reveal ---------------- */
+function initRevealOnScroll() {
+  const els = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale');
+  if (!els.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  els.forEach(el => io.observe(el));
+}
+
+/* ---------------- Animated number counters ---------------- */
+function initCounters() {
+  const counters = document.querySelectorAll('.stat-num[data-count]');
+  if (!counters.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = parseInt(el.dataset.count, 10);
+      const duration = 900;
+      const start = performance.now();
+      const tick = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        el.textContent = Math.round(progress * target);
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+      io.unobserve(el);
+    });
+  }, { threshold: 0.6 });
+  counters.forEach(c => io.observe(c));
+}
+
+/* ---------------- Services: draggable detective board with strings ---------------- */
+const SERVICE_DATA = [
+  { name: 'Business Operations', desc: "Business setup, process design and day-to-day execution — you focus on strategy, we handle the moving parts." },
+  { name: 'IT Solutions', desc: "Infrastructure, helpdesk and cloud support built for scale — secure systems that keep running smoothly." },
+  { name: 'Hiring Services', desc: "High-performing teams aligned to your goals — from strategic hires to full contract staffing." },
+  { name: 'Payroll Services', desc: "Accurate salary disbursements, tax deductions and statutory filings — your team paid right, every time." },
+  { name: 'SAP Services', desc: "SAP enhancements and post-go-live support, plus flexible staffing when you need experts fast." },
+  { name: 'Shared Workspace', desc: "Fully equipped, flexible space with high-speed internet and private zones — workspace meets business support." }
+];
+
+function initDetectiveBoard() {
+  const board = document.getElementById('detectiveBoard');
+  const hub = document.getElementById('boardHub');
+  const svg = document.getElementById('stringSvg');
+  const notes = Array.from(document.querySelectorAll('.board-note'));
+  const eyebrow = document.getElementById('boardDetailEyebrow');
+  const desc = document.getElementById('boardDetailDesc');
+  const cursorRing = document.getElementById('cursorRing');
+  if (!board || !hub || !svg || !notes.length) return;
+
+  const lines = new Map();
+
+  function ensureLine(note) {
+    if (lines.has(note)) return lines.get(note);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('stroke', '#7C8591');
+    line.setAttribute('stroke-width', '1.5');
+    line.setAttribute('stroke-dasharray', '5 5');
+    svg.appendChild(line);
+    lines.set(note, line);
+    return line;
+  }
+
+  function updateLine(note) {
+    const boardRect = board.getBoundingClientRect();
+    const hubRect = hub.getBoundingClientRect();
+    const noteRect = note.getBoundingClientRect();
+
+    const hx = hubRect.left + hubRect.width / 2 - boardRect.left;
+    const hy = hubRect.top + hubRect.height / 2 - boardRect.top;
+    const nx = noteRect.left + noteRect.width / 2 - boardRect.left;
+    const ny = noteRect.top + noteRect.height / 2 - boardRect.top;
+
+    const line = ensureLine(note);
+    line.setAttribute('x1', hx);
+    line.setAttribute('y1', hy);
+    line.setAttribute('x2', nx);
+    line.setAttribute('y2', ny);
+  }
+
+  function updateAllLines() {
+    const boardRect = board.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${boardRect.width} ${boardRect.height}`);
+    notes.forEach(updateLine);
+  }
+
+  function showDetail(index) {
+    const data = SERVICE_DATA[index];
+    if (!data || !eyebrow || !desc) return;
+    eyebrow.textContent = `0${index + 1} · ${data.name}`;
+    desc.textContent = data.desc;
+    notes.forEach(n => n.classList.toggle('is-active', parseInt(n.dataset.service, 10) === index));
+    lines.forEach((line, n) => {
+      line.setAttribute('stroke', parseInt(n.dataset.service, 10) === index ? '#FF8A1E' : '#7C8591');
+      line.setAttribute('stroke-width', parseInt(n.dataset.service, 10) === index ? '2.5' : '1.5');
+    });
+  }
+
+  // drag logic per note
+  notes.forEach(note => {
+    let dragging = false;
+    let offsetX = 0, offsetY = 0;
+
+    note.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      note.classList.add('is-dragging');
+      note.setPointerCapture(e.pointerId);
+      const boardRect = board.getBoundingClientRect();
+      const noteRect = note.getBoundingClientRect();
+      offsetX = e.clientX - (noteRect.left + noteRect.width / 2);
+      offsetY = e.clientY - (noteRect.top + noteRect.height / 2);
+      showDetail(parseInt(note.dataset.service, 10));
+      cursorRing && cursorRing.classList.add('is-dragging');
+    });
+
+    note.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const boardRect = board.getBoundingClientRect();
+      let x = e.clientX - boardRect.left - offsetX;
+      let y = e.clientY - boardRect.top - offsetY;
+      x = Math.max(20, Math.min(boardRect.width - 20, x));
+      y = Math.max(20, Math.min(boardRect.height - 20, y));
+      note.style.left = (x / boardRect.width * 100) + '%';
+      note.style.top = (y / boardRect.height * 100) + '%';
+      updateLine(note);
+    });
+
+    function endDrag(e) {
+      if (!dragging) return;
+      dragging = false;
+      note.classList.remove('is-dragging');
+      cursorRing && cursorRing.classList.remove('is-dragging');
+    }
+    note.addEventListener('pointerup', endDrag);
+    note.addEventListener('pointercancel', endDrag);
+
+    note.addEventListener('click', () => {
+      if (!dragging) showDetail(parseInt(note.dataset.service, 10));
+    });
+  });
+
+  window.addEventListener('resize', updateAllLines);
+  requestAnimationFrame(updateAllLines);
+  showDetail(0);
+}
+
+/* ---------------- Why: fan of cards, click to cycle ---------------- */
+function initFanCards() {
+  const stack = document.getElementById('fanStack');
+  const cards = Array.from(document.querySelectorAll('.fan-card'));
+  if (!stack || !cards.length) return;
+
+  let order = cards.map((_, i) => i); // order[0] = index (into `cards`) of the front card
+
+  function layout() {
+    order.forEach((cardIdx, pos) => {
+      const card = cards[cardIdx];
+      card.classList.toggle('is-front', pos === 0);
+      card.style.zIndex = String(cards.length - pos);
+      if (pos === 0) {
+        card.style.transform = 'rotate(0deg) translateY(-6px) scale(1.02)';
+      } else {
+        const rest = getComputedStyle(card).getPropertyValue('--rest') || '0deg';
+        const spread = pos * 3;
+        card.style.transform = `rotate(${rest}) translate(${pos * 6}px, ${pos * 10}px) scale(${1 - pos * 0.04})`;
+      }
+    });
+  }
+
+  function advance() {
+    order.push(order.shift());
+    layout();
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', advance);
+  });
+
+  layout();
+}
+
+/* ---------------- Custom cursor (desktop only) ---------------- */
+function initCustomCursor() {
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  const label = document.getElementById('cursorLabel');
+  if (!dot || !ring) return;
+
+  let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  let ringX = mouseX, ringY = mouseY;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%,-50%)`;
+  });
+
+  function animateRing() {
+    ringX += (mouseX - ringX) * 0.16;
+    ringY += (mouseY - ringY) * 0.16;
+    ring.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%,-50%)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.board-note')) ring.classList.add('is-dragging');
+  });
+  document.addEventListener('pointerup', () => ring.classList.remove('is-dragging'));
+
+  const hoverTargets = document.querySelectorAll('[data-cursor]');
+  hoverTargets.forEach(el => {
+    const text = el.dataset.cursor;
+    el.addEventListener('mouseenter', () => {
+      if (text) ring.classList.add('is-hover');
+      if (label) label.textContent = text || '';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.classList.remove('is-hover');
+      if (label) label.textContent = '';
+    });
+  });
+}
+
+/* ---------------- Magnetic buttons ---------------- */
+function initMagnetic() {
+  const items = document.querySelectorAll('.magnetic');
+  const ring = document.getElementById('cursorRing');
+  items.forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      el.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
+    });
+    el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+    el.addEventListener('mouseenter', () => ring && ring.classList.add('is-magnetic'));
+    el.addEventListener('mouseleave', () => ring && ring.classList.remove('is-magnetic'));
+  });
+}
+
+/* ---------------- Headline decrypt/scramble text effect ---------------- */
+function initScrambleHeadline(prefersReducedMotion) {
+  const targets = ['scrambleLine1', 'scrambleLine2', 'scrambleLine3']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+  if (!targets.length) return;
+
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#%&*+-/';
+
+  function scramble(el) {
+    const final = el.dataset.final || el.textContent;
+    el.dataset.final = final;
+    const len = final.length;
+    let frame = 0;
+    const totalFrames = 18;
+    clearInterval(el._scrambleTimer);
+    el._scrambleTimer = setInterval(() => {
+      frame++;
+      const revealCount = Math.floor((frame / totalFrames) * len);
+      let out = '';
+      for (let i = 0; i < len; i++) {
+        if (final[i] === ' ') { out += ' '; continue; }
+        out += i < revealCount ? final[i] : CHARS[Math.floor(Math.random() * CHARS.length)];
+      }
+      el.textContent = out;
+      if (frame >= totalFrames) {
+        clearInterval(el._scrambleTimer);
+        el.textContent = final;
+      }
+    }, 28);
+  }
+
+  if (prefersReducedMotion) return;
+
+  targets.forEach((el, i) => setTimeout(() => scramble(el), 400 + i * 220));
+
+  const headline = document.getElementById('heroHeadline');
+  if (headline) {
+    headline.addEventListener('mouseenter', () => {
+      targets.forEach((el, i) => setTimeout(() => scramble(el), i * 90));
+    });
+  }
+}
+
+</script>
+</body>
+</html>

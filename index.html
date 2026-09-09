@@ -260,6 +260,21 @@
   .foot-bottom{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; padding-top:1.6rem; border-top:1.5px solid var(--line); font-size:.8rem; color:var(--muted); }
 
   @media (prefers-reduced-motion: reduce){ *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important; } }
+  /* homepage navigation and dark-card readability refinements */
+  header{padding:20px 6vw;background:transparent;transition:padding .3s var(--ease);}
+  .nav-inner{max-width:1240px;background:transparent;backdrop-filter:none;border-color:transparent;box-shadow:none;padding:.6rem .6rem .6rem 1.3rem;}
+  header.scrolled{padding:10px 4vw;}
+  header.scrolled .nav-inner{max-width:1180px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-color:rgba(255,255,255,.65);box-shadow:0 10px 30px rgba(11,12,16,.13);padding:.58rem .7rem .58rem 1.25rem;}
+  .logo{color:#fff;}
+  header.scrolled .logo{color:var(--ink);}
+  nav.links a{color:rgba(255,255,255,.9);font-weight:700;}
+  header.scrolled nav.links a{color:var(--ink);}
+  nav.links a:hover,header.scrolled nav.links a:hover{background:var(--blue-wash);color:var(--blue-deep);}
+  .nav-cta{display:inline-flex;white-space:nowrap;}
+  .why-panel{color:var(--ink);}
+  .why-panel h3{color:var(--ink);font-weight:800;}
+  .why-panel p{color:#475467;font-weight:600;}
+  .service-slide p{color:#475467;font-weight:600;}
 </style>
 </head>
 <body>
@@ -274,14 +289,13 @@
       OpsLogic
     </a>
     <nav class="links">
-      <a href="#diagnostic">Diagnose</a>
-      <a href="#services">Services</a>
-      <a href="#why">Why Us</a>
-      <a href="#contact">Contact</a>
-      <a href="template-1.html" class="tpl">Template 1</a>
-      <a href="template-2.html" class="tpl">Template 2</a>
+      <a href="about-us.html">About Us</a>
+      <a href="success-stories.html">Success Stories</a>
+      <a href="services.html">Services</a>
+      <a href="careers.html">Careers</a>
+      <a href="contact-us.html">Contact Us</a>
     </nav>
-    <a href="#contact" class="nav-cta magnetic" data-cursor="click">Let's talk</a>
+    <a href="contact-us.html" class="nav-cta magnetic" data-cursor="click">Let's talk</a>
   </div>
 </header>
 
@@ -476,7 +490,7 @@
         </div>
         <div>
           <h4>Company</h4>
-          <ul><li><a href="#about">About Us</a></li><li><a href="#why">Why Us</a></li><li><a href="#contact">Contact</a></li></ul>
+          <ul><li><a href="about-us.html">About Us</a></li><li><a href="success-stories.html">Success Stories</a></li><li><a href="services.html">Services</a></li><li><a href="careers.html">Careers</a></li><li><a href="contact-us.html">Contact</a></li></ul>
         </div>
         <div>
           <h4>Contact</h4>

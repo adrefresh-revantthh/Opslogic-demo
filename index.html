@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>OpsLogic — Let's Make Business Move</title>
 <meta name="description" content="OpsLogic — Business Operations, IT, Hiring, Payroll, SAP & Shared Workspace solutions.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#0b0c10;
@@ -24,16 +21,16 @@
   }
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
-  body{ margin:0; background:var(--paper); color:var(--ink); font-family:'Inter',sans-serif; overflow-x:hidden; cursor:none; }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:"Plus Jakarta Sans"; overflow-x:hidden; cursor:none; }
   ::selection{ background:var(--orange); color:var(--ink); }
   img,svg,video{ max-width:100%; display:block; }
   a{ color:inherit; text-decoration:none; }
   button{ font-family:inherit; cursor:none; background:none; border:0; }
-  h1,h2,h3{ font-family:'Sora',sans-serif; font-weight:700; line-height:1.06; margin:0; letter-spacing:-.01em; }
-  .mono{ font-family:'Space Mono',monospace; }
+  h1,h2,h3{ font-family:"Plus Jakarta Sans"; font-weight:700; line-height:1.06; margin:0; letter-spacing:-.01em; }
+  .mono{ font-family:"Plus Jakarta Sans"; }
   .wrap{ max-width:1240px; margin:0 auto; padding:0 6vw; position:relative; }
   section{ position:relative; padding:6.5rem 0; scroll-margin-top:100px; }
-  .eyebrow{ font-family:'Space Mono',monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-deep); display:inline-flex; align-items:center; gap:.6em; background:var(--blue-wash); padding:.5em 1em; border-radius:100px; }
+  .eyebrow{ font-family:"Plus Jakarta Sans"; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-deep); display:inline-flex; align-items:center; gap:.6em; background:var(--blue-wash); padding:.5em 1em; border-radius:100px; }
   .eyebrow.orange{ color:#b5590c; background:var(--orange-wash); }
   .reveal{ opacity:0; transform:translateY(26px); transition:opacity .75s var(--ease), transform .75s var(--ease); }
   .reveal.in{ opacity:1; transform:translateY(0); }
@@ -52,7 +49,7 @@
     position:absolute; z-index:4; display:flex; align-items:center; gap:.5em;
     background:rgba(255,255,255,.16); border:1.5px solid rgba(255,255,255,.35); backdrop-filter:blur(8px);
     border-radius:100px; padding:.4em 1.05em .4em .4em; color:#fff;
-    font-family:'Space Mono',monospace; font-size:.72rem; font-weight:700; text-transform:uppercase; white-space:nowrap;
+    font-family:"Plus Jakarta Sans"; font-size:.72rem; font-weight:700; text-transform:uppercase; white-space:nowrap;
     animation:bob 4.6s ease-in-out infinite;
   }
   .float-badge .icon-badge{ width:34px; height:34px; }
@@ -62,7 +59,7 @@
   .float-badge-light{
     position:absolute; z-index:4; display:flex; align-items:center; gap:.5em;
     background:var(--card); border:1.5px solid var(--line); border-radius:100px; padding:.4em 1.05em .4em .4em;
-    font-family:'Space Mono',monospace; font-size:.7rem; font-weight:700; text-transform:uppercase; color:var(--ink);
+    font-family:"Plus Jakarta Sans"; font-size:.7rem; font-weight:700; text-transform:uppercase; color:var(--ink);
     box-shadow:0 10px 24px rgba(11,12,16,.1); animation:bob 5s ease-in-out infinite; white-space:nowrap;
   }
   .float-badge-light .icon-badge{ width:34px; height:34px; }
@@ -77,7 +74,7 @@
   .cur-ring{ width:34px; height:34px; border:1.5px solid rgba(255,255,255,.5); transition:width .25s var(--ease),height .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease); }
   body.on-light .cur-ring{ border-color:rgba(11,12,16,.35); }
   .cur-ring.big{ width:88px; height:88px; background:rgba(255,138,30,.16); border-color:var(--orange); }
-  .cur-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Space Mono',monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink); opacity:0; text-align:center; transition:opacity .2s var(--ease); }
+  .cur-label{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:"Plus Jakarta Sans"; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink); opacity:0; text-align:center; transition:opacity .2s var(--ease); }
   .cur-ring.big .cur-label{ opacity:1; }
   @media (hover:none),(pointer:coarse){ .cur-dot,.cur-ring{ display:none; } body,button,a{ cursor:auto; } }
 
@@ -86,13 +83,13 @@
   .nav-inner{ max-width:1240px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;
     padding:.6rem .6rem .6rem 1.3rem; border-radius:100px; transition:background .3s var(--ease), box-shadow .3s var(--ease), border-color .3s var(--ease); border:1.5px solid transparent; }
   header.scrolled .nav-inner{ background:rgba(255,255,255,.86); backdrop-filter:blur(14px); box-shadow:0 10px 30px rgba(11,12,16,.08); border-color:var(--line); }
-  .logo{ display:flex; align-items:center; gap:.55em; font-family:'Sora',sans-serif; font-weight:700; font-size:1.1rem; color:#fff; transition:color .3s var(--ease); }
+  .logo{ display:flex; align-items:center; gap:.55em; font-family:"Plus Jakarta Sans"; font-weight:700; font-size:1.1rem; color:#fff; transition:color .3s var(--ease); }
   header.scrolled .logo{ color:var(--ink); }
   .logo-mark{ width:32px; height:32px; border-radius:9px; background:var(--orange); display:flex; align-items:center; justify-content:center; transform:rotate(-6deg); transition:transform .3s var(--ease); }
   .logo:hover .logo-mark{ transform:rotate(6deg) scale(1.08); }
   .logo-mark span{ color:var(--ink); font-weight:800; font-size:.72rem; }
   nav.links{ display:flex; gap:.2rem; align-items:center; }
-  nav.links a{ font-size:.85rem; font-weight:600; color:rgba(255,255,255,.85); padding:.6em 1em; border-radius:100px; transition:color .3s var(--ease); }
+  nav.links a{ font-size:1.02rem; font-weight:600; color:rgba(255,255,255,.85); padding:.6em 1em; border-radius:100px; transition:color .3s var(--ease); }
   header.scrolled nav.links a{ color:var(--ink); }
   nav.links a:hover{ background:rgba(255,255,255,.14); }
   header.scrolled nav.links a:hover{ background:var(--blue-wash); color:var(--blue-deep); }
@@ -108,7 +105,7 @@
   .video-spot{ position:absolute; z-index:2; inset:0; pointer-events:none; opacity:0; transition:opacity .35s var(--ease); background:radial-gradient(280px circle at var(--sx,50%) var(--sy,50%), rgba(28,167,224,.3), rgba(255,138,30,.14) 45%, transparent 70%); }
   .hero.spotlit .video-spot{ opacity:1; }
   .hero-inner{ position:relative; z-index:3; width:100%; padding-top:80px; }
-  .hero-tag{ color:#fff; font-family:'Space Mono',monospace; font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); display:inline-flex; padding:.5em 1.1em; border-radius:100px; backdrop-filter:blur(6px); }
+  .hero-tag{ color:#fff; font-family:"Plus Jakarta Sans"; font-size:.76rem; letter-spacing:.14em; text-transform:uppercase; opacity:.85; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); display:inline-flex; padding:.5em 1.1em; border-radius:100px; backdrop-filter:blur(6px); }
   .hero h1{ color:#fff; font-size:clamp(2.4rem,7vw,6rem); margin:1.2rem 0 1.4rem; max-width:15ch; }
   .hero h1 .word{ display:inline-block; margin-right:.22em; transition:transform .35s var(--ease), color .35s var(--ease); cursor:none; }
   .hero h1 .word:hover{ color:var(--orange); transform:translateY(-6px) rotate(-2deg); }
@@ -119,7 +116,7 @@
   .btn-primary:hover{ transform:translateY(-3px); }
   .btn-ghost-light{ display:inline-flex; align-items:center; gap:.6em; font-weight:700; font-size:.9rem; color:#fff; padding:1em 1.4em; border:1.5px solid rgba(255,255,255,.5); border-radius:100px; }
   .btn-ghost-light:hover{ border-color:#fff; background:rgba(255,255,255,.12); }
-  .scroll-cue{ position:absolute; bottom:34px; left:6vw; z-index:3; display:flex; align-items:center; gap:.7em; color:rgba(255,255,255,.75); font-family:'Space Mono',monospace; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; }
+  .scroll-cue{ position:absolute; bottom:34px; left:6vw; z-index:3; display:flex; align-items:center; gap:.7em; color:rgba(255,255,255,.75); font-family:"Plus Jakarta Sans"; font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; }
   .scroll-cue .line{ width:32px; height:1px; background:rgba(255,255,255,.5); position:relative; overflow:hidden; }
   .scroll-cue .line::after{ content:''; position:absolute; left:-100%; top:0; bottom:0; width:100%; background:var(--orange); animation:cue 2.2s ease-in-out infinite; }
   @keyframes cue{ 0%{left:-100%;} 50%{left:0;} 100%{left:100%;} }
@@ -134,13 +131,13 @@
   .chip{ text-align:left; border:1.5px solid var(--line); background:var(--card); border-radius:16px; padding:1.05rem 1.3rem; font-weight:600; font-size:.98rem; display:flex; justify-content:space-between; align-items:center; transition:border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease); }
   .chip:hover{ border-color:var(--blue); transform:translateX(4px); }
   .chip.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
-  .chip .arrow{ font-family:'Space Mono',monospace; opacity:.5; transition:transform .2s var(--ease); }
+  .chip .arrow{ font-family:"Plus Jakarta Sans"; opacity:.5; transition:transform .2s var(--ease); }
   .chip.active .arrow{ opacity:1; transform:translateX(4px); color:var(--orange); }
 
   .diag-panel{ background:var(--ink); color:#fff; border-radius:26px; padding:2.4rem; min-height:280px; display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden; }
   .diag-panel::before{ content:''; position:absolute; width:260px; height:260px; background:radial-gradient(circle, rgba(28,167,224,.35), transparent 70%); top:-80px; right:-80px; border-radius:50%; }
   .diag-panel-body{ position:relative; z-index:1; }
-  .diag-panel .tag{ font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); }
+  .diag-panel .tag{ font-family:"Plus Jakarta Sans"; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--orange); }
   .diag-panel h3{ color:#fff; font-size:1.5rem; margin:.8rem 0 .8rem; }
   .diag-panel p{ color:rgba(255,255,255,.75); font-size:.95rem; line-height:1.65; max-width:44ch; }
   .diag-panel a.diag-cta{ position:relative; z-index:1; margin-top:1.4rem; display:inline-flex; align-items:center; gap:.5em; font-weight:700; font-size:.88rem; color:var(--blue); }
@@ -150,7 +147,7 @@
   .services{ overflow:hidden; }
   .services-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-bottom:2rem; }
   .services-head h2{ font-size:clamp(1.8rem,3.2vw,2.6rem); margin-top:.6rem; max-width:16ch; }
-  .drag-hint{ font-family:'Space Mono',monospace; font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:.5em; }
+  .drag-hint{ font-family:"Plus Jakarta Sans"; font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; display:flex; align-items:center; gap:.5em; }
   .gallery-track{ display:flex; gap:1.2rem; overflow-x:auto; padding:.5rem 6vw 2rem; margin:0 -6vw; scroll-snap-type:x proximity; cursor:grab; scrollbar-width:none; }
   .gallery-track::-webkit-scrollbar{ display:none; }
   .gallery-track.dragging{ cursor:grabbing; scroll-behavior:auto; }
@@ -161,7 +158,7 @@
   .service-slide:nth-child(6n+4){ background:var(--orange-wash); }
   .service-slide:nth-child(6n+5){ background:var(--blue-wash); }
   .service-slide:nth-child(6n+6){ background:#eef0ff; }
-  .service-slide .idx{ font-family:'Space Mono',monospace; font-size:.72rem; color:var(--muted); }
+  .service-slide .idx{ font-family:"Plus Jakarta Sans"; font-size:.72rem; color:var(--muted); }
   .service-slide h3{ font-size:1.3rem; margin:1rem 0 .7rem; }
   .service-slide p{ color:var(--muted); font-size:.9rem; line-height:1.6; }
   .gallery-nav{ display:flex; gap:.6rem; }
@@ -172,7 +169,7 @@
   .terminal-wrap{ background:var(--ink); border-radius:26px; padding:2.2rem 2.4rem; color:#d8ecf5; box-shadow:0 30px 60px rgba(11,12,16,.2); }
   .terminal-head{ display:flex; gap:.5em; margin-bottom:1.4rem; }
   .terminal-dot{ width:11px; height:11px; border-radius:50%; }
-  .terminal-line{ font-family:'Space Mono',monospace; font-size:.92rem; line-height:1.9; opacity:0; }
+  .terminal-line{ font-family:"Plus Jakarta Sans"; font-size:.92rem; line-height:1.9; opacity:0; }
   .terminal-line.shown{ opacity:1; }
   .terminal-line .prompt{ color:var(--orange); }
   .terminal-line .val{ color:var(--blue); font-weight:700; }
@@ -189,7 +186,7 @@
   .about-card::before{ content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(28,167,224,.72), rgba(255,138,30,.72)); mix-blend-mode:multiply; }
   .about-card::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,12,16,0) 40%, rgba(11,12,16,.55) 100%); }
   .about-card p{ position:relative; z-index:2; align-self:flex-end; margin:0; padding:2.2rem; }
-  .about-card p{ font-family:'Sora',sans-serif; color:#fff; font-size:1.3rem; font-weight:700; line-height:1.4; }
+  .about-card p{ font-family:"Plus Jakarta Sans"; color:#fff; font-size:1.3rem; font-weight:700; line-height:1.4; }
   .about-para{ opacity:.32; transform:translateY(10px); transition:opacity .5s var(--ease), transform .5s var(--ease); padding:2.6rem 0; border-top:1.5px solid var(--line); font-size:1.15rem; line-height:1.75; color:var(--muted); max-width:56ch; }
   .about-para.active{ opacity:1; transform:translateY(0); color:var(--ink); }
   .about-para strong{ color:var(--ink); }
@@ -202,7 +199,7 @@
   .why-panel{ display:none; background:var(--card); border:1.5px solid var(--line); border-radius:24px; padding:2.4rem; }
   .why-panel.active{ display:grid; grid-template-columns:auto 1fr; gap:2rem; align-items:center; }
   @media (max-width:700px){ .why-panel.active{ grid-template-columns:1fr; } }
-  .why-num{ font-family:'Sora',sans-serif; font-weight:800; font-size:3.6rem; color:var(--blue-wash); -webkit-text-stroke:2px var(--blue); }
+  .why-num{ font-family:"Plus Jakarta Sans"; font-weight:800; font-size:3.6rem; color:var(--blue-wash); -webkit-text-stroke:2px var(--blue); }
   .why-panel h3{ font-size:1.4rem; margin-bottom:.7rem; }
   .why-panel p{ color:var(--muted); line-height:1.7; max-width:56ch; }
 
@@ -232,7 +229,7 @@
   .stage-sticker{
     position:absolute; z-index:5; display:flex; align-items:center; gap:.5em;
     background:var(--card); border:2px solid var(--ink); border-radius:100px; padding:.7em 1.15em;
-    font-family:'Space Mono',monospace; font-weight:700; font-size:.76rem; text-transform:uppercase; white-space:nowrap;
+    font-family:"Plus Jakarta Sans"; font-weight:700; font-size:.76rem; text-transform:uppercase; white-space:nowrap;
     box-shadow:0 10px 24px rgba(11,12,16,.14); cursor:none;
     animation:stickerfloat 5s ease-in-out infinite;
     transition:transform .25s var(--ease), background .25s var(--ease), color .25s var(--ease), box-shadow .25s var(--ease);
@@ -250,10 +247,10 @@
 
   footer{ padding:5rem 0 2.2rem; border-top:1.5px solid var(--line); }
   .foot-top{ display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:2rem; margin-bottom:3rem; }
-  .foot-top .flogo{ font-family:'Sora',sans-serif; font-weight:800; font-size:clamp(2.4rem,7vw,5rem); letter-spacing:-.02em; }
+  .foot-top .flogo{ font-family:"Plus Jakarta Sans"; font-weight:800; font-size:clamp(2.4rem,7vw,5rem); letter-spacing:-.02em; }
   .foot-top .flogo .orange{ color:var(--orange); }
   .foot-links{ display:flex; gap:2.4rem; flex-wrap:wrap; }
-  .foot-links h4{ font-family:'Space Mono',monospace; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 .8rem; }
+  .foot-links h4{ font-family:"Plus Jakarta Sans"; font-size:.7rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:0 0 .8rem; }
   .foot-links ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
   .foot-links a{ font-size:.9rem; }
   .foot-links a:hover{ color:var(--orange); }
@@ -267,7 +264,7 @@
   header.scrolled .nav-inner{max-width:1180px;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-color:rgba(255,255,255,.65);box-shadow:0 10px 30px rgba(11,12,16,.13);padding:.58rem .7rem .58rem 1.25rem;}
   .logo{color:#fff;}
   header.scrolled .logo{color:var(--ink);}
-  nav.links a{color:rgba(255,255,255,.9);font-weight:700;}
+  nav.links a{color:rgba(255,255,255,.9);font-weight:800;font-size:1.02rem;}
   header.scrolled nav.links a{color:var(--ink);}
   nav.links a:hover,header.scrolled nav.links a:hover{background:var(--blue-wash);color:var(--blue-deep);}
   .nav-cta{display:inline-flex;white-space:nowrap;}
@@ -275,6 +272,13 @@
   .why-panel h3{color:var(--ink);font-weight:800;}
   .why-panel p{color:#475467;font-weight:600;}
   .service-slide p{color:#475467;font-weight:600;}
+</style>
+<link rel="stylesheet" href="site.css"><style><style>
+@font-face{font-family:"Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-Medium.ttf") format("truetype");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:"Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-SemiBold.ttf") format("truetype");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:"Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"Plus Jakarta Sans";src:url("assets/fonts/PlusJakartaSans-ExtraBold.ttf") format("truetype");font-weight:800 900;font-style:normal;font-display:swap}
 </style>
 </head>
 <body>
@@ -290,8 +294,9 @@
     </a>
     <nav class="links">
       <a href="about-us.html">About Us</a>
-      <a href="success-stories.html">Success Stories</a>
-      <a href="services.html">Services</a>
+      <div class="home-service-drop"><button type="button">Services ↘</button><div class="home-service-menu">
+      <a href="business-operations.html">Business Operations</a><a href="it-solutions.html">IT Solutions</a><a href="hiring-services.html">Hiring Services</a><a href="payroll-services.html">Payroll Services</a><a href="sap-services.html">SAP Services</a><a href="shared-workspaces.html">Shared Workspaces</a>
+      </div></div>
       <a href="careers.html">Careers</a>
       <a href="contact-us.html">Contact Us</a>
     </nav>
@@ -479,7 +484,7 @@
 
 </main>
 
-<footer>
+<footer class="ops-footer">
   <div class="wrap">
     <div class="foot-top">
       <div class="flogo">Ops<span class="orange">Logic</span></div>
@@ -756,7 +761,7 @@
   var io = new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold:0.15 });
-  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  document.querySelectorAll('.reveal,.service-slide').forEach(function(el){ io.observe(el); });
 
   var termIo = new IntersectionObserver(function(entries){
     entries.forEach(function(e){ if(e.isIntersecting){ buildTerminal(); termIo.disconnect(); } });
